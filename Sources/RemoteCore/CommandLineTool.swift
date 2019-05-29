@@ -3,14 +3,14 @@ import Foundation
 public final class CommandLineTool {
     private let arguments: [String]
 
-    public init(arguments: [String] = CommandLine.arguments) { 
+    public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
     }
 
     public func run() throws {
 
         if (self.arguments.indices.contains(1)) {
-            
+
             let cmd = self.arguments[1]
             let remote = RemoteControl()
 
@@ -32,6 +32,6 @@ public final class CommandLineTool {
         } else {
             print ("  example usage:  Remote play")
         }
-        
+
     }
 }

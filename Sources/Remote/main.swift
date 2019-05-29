@@ -1,5 +1,5 @@
 import RemoteCore
-        
+
 do {
     let tool = CommandLineTool()
     try tool.run()

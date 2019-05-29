@@ -3,9 +3,9 @@ import Foundation
 public final class RemoteControl {
     private let baseurl: String
 
-    public init() { 
+    public init() {
         URLCache.shared.removeAllCachedResponses()
-        URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil) 
+        URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
 
         self.baseurl = "http://192.168.1.20:8080"
     }
@@ -21,7 +21,7 @@ public final class RemoteControl {
             sema.signal(); // signals the process to continue
         };
 
-        task.resume()        
+        task.resume()
         sema.wait() // sets the process to wait
     }
 

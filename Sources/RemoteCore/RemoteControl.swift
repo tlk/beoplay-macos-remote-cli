@@ -2,18 +2,19 @@ import Foundation
 import SwiftyJSON
 
 public final class RemoteControl {
-    private let baseurl: String
+    private let proto: String, ip: String, port: String
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
-
-        self.baseurl = "http://192.168.1.20:8080"
+        self.proto = UserDefaults.standard.string(forKey: "http") ?? "http"
+        self.ip = UserDefaults.standard.string(forKey: "ip") ?? "192.168.1.20"
+        self.port = UserDefaults.standard.string(forKey: "port") ?? "8080"
     }
 
     private func request(path: String, method: String, body: String? = nil, completion: ((Data?) -> Void)? = nil) {
         let sema = DispatchSemaphore(value: 0)
-        let url = URL(string: self.baseurl + path)!
+        let url = URL(string: self.proto + "://" + self.ip + ":" + self.port + path)!
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.httpBody = body?.data(using: .utf8)

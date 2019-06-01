@@ -1,35 +1,41 @@
 import Foundation
 
 public final class CommandLineTool {
-    private let arguments: [String]
+    public let commands = [
+        "play",
+        "pause",
+        "stop",
+        "forward",
+        "backward",
+        "getVolume",
+        "setVolume"
+    ]
 
-    public init(arguments: [String] = CommandLine.arguments) {
-        self.arguments = arguments
-    }
+    public init() {}
 
-    public func run() throws {
+    public func run(arguments: [String]) throws {
 
-        if (self.arguments.indices.contains(1)) {
+        if (arguments.indices.contains(0)) {
 
-            let cmd = self.arguments[1]
-            let remote = RemoteControl()
+            let cmd = arguments[0]
+            let remoteControl = RemoteControl()
 
             switch cmd {
             case "play":
-                try remote.play()
+                try remoteControl.play()
             case "pause":
-                try remote.pause()
+                try remoteControl.pause()
             case "stop":
-                try remote.stop()
+                try remoteControl.stop()
             case "forward":
-                try remote.forward()
+                try remoteControl.forward()
             case "backward":
-                try remote.backward()
+                try remoteControl.backward()
             case "getVolume":
-                try remote.getVolume()
+                try remoteControl.getVolume()
             case "setVolume":
-                let volume = Int(self.arguments[2])
-                try remote.setVolume(volume: volume!)
+                let vol = Int(arguments[1])
+                try remoteControl.setVolume(volume: vol!)
             default:
                 print ("unknown argument")
             }

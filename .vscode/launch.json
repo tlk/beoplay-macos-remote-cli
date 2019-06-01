@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/.build/debug/Remote",
-            "args": [], // "play"
+            "args": ["setVolume", "48"], // "getVolume"
             "cwd": "${workspaceFolder}"
         }
     ]

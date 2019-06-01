@@ -25,6 +25,11 @@ public final class CommandLineTool {
                 try remote.forward()
             case "backward":
                 try remote.backward()
+            case "getVolume":
+                try remote.getVolume()
+            case "setVolume":
+                let volume = Int(self.arguments[2])
+                try remote.setVolume(volume: volume!)
             default:
                 print ("unknown argument")
             }

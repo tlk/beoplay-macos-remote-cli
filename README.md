@@ -18,7 +18,7 @@ The loudspeakers are accessible through a web interface (fx http://192.168.1.20/
 When you know the IP address of the beoplay loudspeakers it must be stored in the `beoplay-cli` user preferences:
 
 ```
-defaults write beoplay-cli ip 192.168.1.20     # (<-- change this to the loudspeakers ip address)
+defaults write beoplay-cli host 192.168.1.20     # (<-- change this to the loudspeakers ip address)
 ```
 
 ## Usage

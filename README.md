@@ -1,6 +1,6 @@
 # beoplay-cli
 
-This is an unofficial Mac OS command line utility to remote control network enabled beoplay loudspeakers such as the Beoplay M5.
+This is an unofficial command line utility for Mac OS to remote control network enabled beoplay loudspeakers such as the Beoplay M5.
 
 ## Installation
 

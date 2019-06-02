@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/.build/debug/Remote",
+            "program": "${workspaceFolder}/.build/debug/beoplay-cli",
             "args": ["setVolume", "48"], // "getVolume"
             "cwd": "${workspaceFolder}"
         }

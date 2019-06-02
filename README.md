@@ -44,4 +44,18 @@ $ beoplay-cli
 > getVolume
 35
 > 
+> receiveVolumeNotifications
+connection state: connecting
+connection state: online
+36
+38
+39
+40
+
+connection state: disconnecting
+connection state: offline
+> 
+> help
+available commands: ["play", "pause", "stop", "forward", "backward", "getVolume", "setVolume ", "receiveVolumeNotifications", "help", "?"]
+> 
 ```

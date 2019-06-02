@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 public final class CommandLineTool {
     public let commands = [
@@ -8,16 +9,28 @@ public final class CommandLineTool {
         "forward",
         "backward",
         "getVolume",
-        "setVolume"
+        "setVolume ",
+        "receiveVolumeNotifications",
     ]
 
     public init() {}
 
     public func run(arguments: [String]) throws {
+        func volumeHandler(volume: Int) {
+            print(volume)
+        }
+
+        func connectionHandler(state: RemoteNotificationsSession.ConnectionState) {
+            fputs("connection state: \(state)\n", stderr)
+        }
 
         if (arguments.indices.contains(0)) {
-
             let cmd = arguments[0]
+            var opt: Int? = nil
+            if arguments.indices.contains(1) {
+                opt = Int(arguments[1])
+            }
+
             let remoteControl = RemoteControl()
 
             switch cmd {
@@ -32,16 +45,23 @@ public final class CommandLineTool {
             case "backward":
                 try remoteControl.backward()
             case "getVolume":
-                try remoteControl.getVolume()
+                try remoteControl.getVolume(callback: volumeHandler)
             case "setVolume":
-                let vol = Int(arguments[1])
-                try remoteControl.setVolume(volume: vol!)
+                if opt == nil {
+                    print("  example:  setVolume 20")
+                } else {
+                    try remoteControl.setVolume(volume: opt!)
+                }
+            case "receiveVolumeNotifications":
+                remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
+                _ = readLine()
+                remoteControl.stopVolumeNotifications()
             default:
                 print ("unknown argument")
             }
 
         } else {
-            print ("  example usage:  Remote play")
+            print ("  example:  beoplay-cli play")
         }
 
     }

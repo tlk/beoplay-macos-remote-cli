@@ -2,20 +2,25 @@ import Foundation
 import SwiftyJSON
 
 public final class RemoteControl {
-    private let proto: String, ip: String, port: String
+    private var components = URLComponents()
+    private var remoteNotificationsSession: RemoteNotificationsSession?
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
-        self.proto = UserDefaults.standard.string(forKey: "http") ?? "http"
-        self.ip = UserDefaults.standard.string(forKey: "ip") ?? "192.168.1.20"
-        self.port = UserDefaults.standard.string(forKey: "port") ?? "8080"
+
+        self.components.scheme = UserDefaults.standard.string(forKey: "scheme") ?? "http"
+        self.components.host = UserDefaults.standard.string(forKey: "host") ?? "192.168.1.20"
+
+        let port = UserDefaults.standard.integer(forKey: "port")
+        self.components.port = port > 0 ? port : 8080
     }
 
     private func request(path: String, method: String, body: String? = nil, completion: ((Data?) -> Void)? = nil) {
         let sema = DispatchSemaphore(value: 0)
-        let url = URL(string: self.proto + "://" + self.ip + ":" + self.port + path)!
-        var request = URLRequest(url: url)
+        var urlComponents = self.components
+        urlComponents.path = path
+        var request = URLRequest(url: urlComponents.url!)
         request.httpMethod = method
         request.httpBody = body?.data(using: .utf8)
 
@@ -53,19 +58,44 @@ public final class RemoteControl {
         request(path: "/BeoZone/Zone/Stream/Backward/Release", method: "POST");
     }
 
-    public func getVolume() throws {
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completion: 
-        { data in 
+    public func getVolume(callback: @escaping (Int) -> Void) throws {
+        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completion: { data in
             do {
                 let json = try JSON(data: data!)
-                print(json["speaker"]["level"])
+                if let volume = Int(json["speaker"]["level"].stringValue) {
+                    callback(volume)
+                }
             } catch {
-                print("nil")
+                // ignore
             }
         });
     }
 
     public func setVolume(volume: Int) throws {
-        request(path:"/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}")
+        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}")
+    }
+
+    public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> Void, connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState) -> Void) {
+        func volumeFragmentReader(data: Data) {
+            do {
+                let json = try JSON(data: data)
+                if json["notification"]["type"].stringValue == "VOLUME" {
+                    if let volume = Int(json["notification"]["data"]["speaker"]["level"].stringValue) {
+                        volumeUpdate(volume)
+                    }
+                }
+            } catch {
+                // ignore
+            }
+        }
+
+        var urlComponents = self.components
+        urlComponents.path = "/BeoNotify/Notifications"
+        self.remoteNotificationsSession = RemoteNotificationsSession(url: urlComponents.url!, fragmentReader: volumeFragmentReader, connectionCallback: connectionUpdate)
+        self.remoteNotificationsSession?.start()
+    }
+
+    public func stopVolumeNotifications() {
+        self.remoteNotificationsSession?.stop()
     }
 }

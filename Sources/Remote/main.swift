@@ -1,3 +1,4 @@
+import Darwin
 import RemoteCore
 import LineNoise
 
@@ -32,7 +33,7 @@ func interactive() {
             let input = try ln.getLine(prompt: "> ")
             print("")
 
-            if input == "exit" || input == "" {
+            if input == "exit" || input == "quit" || input == "" {
                 break
             }
 
@@ -47,7 +48,7 @@ func interactive() {
             done = true
             print("")
         } catch {
-            print(error)
+            fputs("\(error)\n", stderr)
         }
     }
 }
@@ -62,5 +63,5 @@ do {
         interactive()
     }
 } catch {
-    print("An error occurred: \(error)")
+    fputs("An error occurred: \(error)\n", stderr)
 }

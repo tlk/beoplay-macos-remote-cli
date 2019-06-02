@@ -11,6 +11,8 @@ public final class CommandLineTool {
         "getVolume",
         "setVolume ",
         "receiveVolumeNotifications",
+        "help",
+        "?",
     ]
 
     public init() {}
@@ -48,7 +50,7 @@ public final class CommandLineTool {
                 try remoteControl.getVolume(callback: volumeHandler)
             case "setVolume":
                 if opt == nil {
-                    print("  example:  setVolume 20")
+                    fputs("  example:  setVolume 20\n", stderr)
                 } else {
                     try remoteControl.setVolume(volume: opt!)
                 }
@@ -56,12 +58,16 @@ public final class CommandLineTool {
                 remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
                 _ = readLine()
                 remoteControl.stopVolumeNotifications()
+            case "help":
+                fallthrough
+            case "?":
+                print("available commands: \(self.commands)")
             default:
-                print ("unknown argument")
+                fputs("unknown argument\n", stderr)
             }
 
         } else {
-            print ("  example:  beoplay-cli play")
+            fputs("  example:  beoplay-cli play\n", stderr)
         }
 
     }

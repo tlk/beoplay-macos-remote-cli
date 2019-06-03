@@ -13,7 +13,7 @@ $
 ```
 
 ## Configuration
-The loudspeakers are accessible through a web interface (fx http://192.168.1.20/index.fcgi) and the command line tool needs to know this IP address. You will have to do some discovery yourself if you do not already know what this is. Tip: check your router for a list of connected devices.
+The loudspeakers are accessible through a web interface (fx http://192.168.1.20/index.fcgi) and `beoplay-cli` needs to know this IP address. You will have to do some discovery yourself if you do not already know what it is. Tip: check your router for a list of connected devices.
 
 When you know the IP address of the beoplay loudspeakers it must be stored in the `beoplay-cli` user preferences:
 

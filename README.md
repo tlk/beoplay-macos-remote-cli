@@ -7,8 +7,9 @@ This is an unofficial command line utility for Mac OS to remote control network 
 ```
 $ make install
 swift build -c release
-[5/5] Linking ./.build/x86_64-apple-macosx/release/Remote
-cp .build/release/Remote /usr/local/bin/beoplay-cli
+[5/5] Linking ./.build/x86_64-apple-macosx/release/beoplay-cli
+cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
+defaults write beoplay-cli host 192.168.1.20     # (<-- change this to the loudspeakers ip address)
 $ 
 ```
 

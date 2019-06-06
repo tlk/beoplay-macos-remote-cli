@@ -1,7 +1,7 @@
 import Foundation
-import Darwin
+import RemoteCore
 
-public final class CommandLineTool {
+public class CommandLineTool {
     public let commands = [
         "play",
         "pause",
@@ -17,13 +17,31 @@ public final class CommandLineTool {
 
     public init() {}
 
-    public func run(arguments: [String]) throws {
-        func volumeHandler(volume: Int) {
-            print(volume)
+    public func run(arguments: [String]) {
+        let sema = DispatchSemaphore(value: 0)
+        func block() {
+            sema.wait()
         }
 
-        func connectionHandler(state: RemoteNotificationsSession.ConnectionState) {
-            fputs("connection state: \(state)\n", stderr)
+        func unblock() {
+            sema.signal();
+        }
+
+        func volumeHandler(volume: Int?) {
+            if volume == nil {
+                fputs("no volume level reading\n", stderr)
+            } else {
+                print(volume!)
+            }
+            unblock()
+        }
+
+        func connectionHandler(state: RemoteNotificationsSession.ConnectionState, message: String?) {
+            if message == nil {
+                fputs("connection state: \(state)\n", stderr)
+            } else {
+                fputs("connection state: \(state): \(message!)\n", stderr)
+            }
         }
 
         if (arguments.indices.contains(0)) {
@@ -37,22 +55,29 @@ public final class CommandLineTool {
 
             switch cmd {
             case "play":
-                try remoteControl.play()
+                remoteControl.play(unblock)
+                block()
             case "pause":
-                try remoteControl.pause()
+                remoteControl.pause(unblock)
+                block()
             case "stop":
-                try remoteControl.stop()
+                remoteControl.stop(unblock)
+                block()
             case "forward":
-                try remoteControl.forward()
+                remoteControl.forward(unblock)
+                block()
             case "backward":
-                try remoteControl.backward()
+                remoteControl.backward(unblock)
+                block()
             case "getVolume":
-                try remoteControl.getVolume(callback: volumeHandler)
+                remoteControl.getVolume(volumeHandler)
+                block()
             case "setVolume":
                 if opt == nil {
                     fputs("  example:  setVolume 20\n", stderr)
                 } else {
-                    try remoteControl.setVolume(volume: opt!)
+                    remoteControl.setVolume(volume: opt!, unblock)
+                    block()
                 }
             case "receiveVolumeNotifications":
                 remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)

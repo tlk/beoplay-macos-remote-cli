@@ -1,7 +1,7 @@
 import Foundation
 import SwiftyJSON
 
-public final class RemoteControl {
+public class RemoteControl {
     private var components = URLComponents()
     private var remoteNotificationsSession: RemoteNotificationsSession?
 
@@ -16,8 +16,12 @@ public final class RemoteControl {
         self.components.port = port > 0 ? port : 8080
     }
 
-    private func request(path: String, method: String, body: String? = nil, completion: ((Data?) -> Void)? = nil) {
-        let sema = DispatchSemaphore(value: 0)
+    private func request(path: String, 
+            method: String, 
+            body: String? = nil, 
+            completionData: ((Data?) -> ())? = nil, 
+            _ completion: (() -> ())? = nil) {
+
         var urlComponents = self.components
         urlComponents.path = path
         var request = URLRequest(url: urlComponents.url!)
@@ -25,67 +29,67 @@ public final class RemoteControl {
         request.httpBody = body?.data(using: .utf8)
 
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            completion?(data)
-            sema.signal(); // signals the process to continue
+            completionData?(data)
+            completion?()
         };
 
         task.resume()
-        sema.wait() // sets the process to wait
     }
 
-    public func play() throws {
-        request(path: "/BeoZone/Zone/Stream/Play", method: "POST");
+    public func play(_ completion: @escaping () -> ()) {
+        request(path: "/BeoZone/Zone/Stream/Play", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Play/Release", method: "POST");
     }
 
-    public func pause() throws {
-        request(path: "/BeoZone/Zone/Stream/Pause", method: "POST");
+    public func pause(_ completion: @escaping () -> ()) {
+        request(path: "/BeoZone/Zone/Stream/Pause", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Pause/Release", method: "POST");
     }
 
-    public func stop() throws {
-        request(path: "/BeoZone/Zone/Stream/Stop", method: "POST");
+    public func stop(_ completion: @escaping () -> ()) {
+        request(path: "/BeoZone/Zone/Stream/Stop", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Stop/Release", method: "POST");
     }
 
-    public func forward() throws {
-        request(path: "/BeoZone/Zone/Stream/Forward", method: "POST");
+    public func forward(_ completion: @escaping () -> ()) {
+        request(path: "/BeoZone/Zone/Stream/Forward", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Forward/Release", method: "POST");
     }
 
-    public func backward() throws {
-        request(path: "/BeoZone/Zone/Stream/Backward", method: "POST");
+    public func backward(_ completion: @escaping () -> ()) {
+        request(path: "/BeoZone/Zone/Stream/Backward", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Backward/Release", method: "POST");
     }
 
-    public func getVolume(callback: @escaping (Int) -> Void) throws {
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completion: { data in
-            do {
-                let json = try JSON(data: data!)
-                if let volume = Int(json["speaker"]["level"].stringValue) {
-                    callback(volume)
-                }
-            } catch {
-                // ignore
+    public func getVolume(_ completion: @escaping (Int?) -> ()) {
+        func getVolumeFromJSON(_ data: Data?) -> Int? {
+            var volume: Int?
+            if let json = try? JSON(data: data!) {
+                volume = Int(json["speaker"]["level"].stringValue)
             }
-        });
+            return volume
+        }
+
+        func completionData(data: Data?) {
+            let vol = getVolumeFromJSON(data)
+            completion(vol)
+        }
+
+        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completionData: completionData)
     }
 
-    public func setVolume(volume: Int) throws {
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}")
+    public func setVolume(volume: Int, _ completion: @escaping () -> ()) {
+        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}", completion)
     }
 
-    public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> Void, connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState) -> Void) {
+    public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> (), connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState, String?) -> ()) {
         func volumeFragmentReader(data: Data) {
-            do {
-                let json = try JSON(data: data)
+            if let json = try? JSON(data: data) {
                 if json["notification"]["type"].stringValue == "VOLUME" {
                     if let volume = Int(json["notification"]["data"]["speaker"]["level"].stringValue) {
                         volumeUpdate(volume)
                     }
                 }
-            } catch {
-                // ignore
             }
         }
 

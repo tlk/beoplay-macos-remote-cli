@@ -2,8 +2,8 @@ import Foundation
 
 public class RemoteNotificationsSession : NSObject, URLSessionDataDelegate {
     private let url: URL
-    private let fragmentReader: (Data) -> Void
-    private let connectionCallback: (ConnectionState) -> Void
+    private let fragmentReader: (Data) -> ()
+    private let connectionCallback: (ConnectionState, String?) -> ()
     private var shutdown = false
     private var state = ConnectionState.offline
     private var backoff = 1
@@ -15,10 +15,10 @@ public class RemoteNotificationsSession : NSObject, URLSessionDataDelegate {
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
 
-    private func updateConnectionState(state: ConnectionState) {
+    private func updateConnectionState(state: ConnectionState, message: String? = nil) {
         if self.state != state {
-            self.connectionCallback(state)
             self.state = state
+            self.connectionCallback(state, message)
         }
     }
 
@@ -30,7 +30,7 @@ public class RemoteNotificationsSession : NSObject, URLSessionDataDelegate {
         case online = 5
     }
 
-    public init(url: URL, fragmentReader: @escaping (Data) -> Void, connectionCallback: @escaping (ConnectionState) -> Void) {
+    public init(url: URL, fragmentReader: @escaping (Data) -> (), connectionCallback: @escaping (ConnectionState, String?) -> ()) {
         self.url = url
         self.fragmentReader = fragmentReader
         self.connectionCallback = connectionCallback
@@ -38,36 +38,40 @@ public class RemoteNotificationsSession : NSObject, URLSessionDataDelegate {
 
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         self.fragmentReader(data)
-        self.updateConnectionState(state: ConnectionState.online)
-        self.backoff = 1
+
+        if self.backoff != 1 {
+            self.backoff = 1
+            self.updateConnectionState(state: ConnectionState.online, message: "backoff reset to \(self.backoff)s")
+        } else {
+            self.updateConnectionState(state: ConnectionState.online)
+        }
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if error != nil {
-            //print("error: \(error!)")
-        }
-
-        self.updateConnectionState(state: ConnectionState.offline)
+        self.updateConnectionState(state: ConnectionState.offline, message: error?.localizedDescription)
         self.reconnect()
     }
 
     private func reconnect() {
         if !self.shutdown {
-            self.updateConnectionState(state: ConnectionState.reconnecting)
+            self.updateConnectionState(state: ConnectionState.reconnecting, message: "backoff is \(self.backoff)s")
             let ms = UInt32(self.backoff * 1000000)
-            //print("usleep(\(ms))")
             usleep(ms)
+
             if self.backoff < 125 {
                 self.backoff *= 5
             }
-            self.start()
+
+            if !self.shutdown {
+                self.start()
+            }
         }
     }
 
     public func start() {
+        self.shutdown = false
         self.updateConnectionState(state: ConnectionState.connecting)
-        let task = self.session.dataTask(with: self.url)
-        task.resume()
+        self.session.dataTask(with: self.url).resume()
     }
 
     public func stop() {

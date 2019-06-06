@@ -36,27 +36,27 @@ public class RemoteControl {
         task.resume()
     }
 
-    public func play(_ completion: @escaping () -> ()) {
+    public func play(_ completion: @escaping () -> () = {}) {
         request(path: "/BeoZone/Zone/Stream/Play", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Play/Release", method: "POST");
     }
 
-    public func pause(_ completion: @escaping () -> ()) {
+    public func pause(_ completion: @escaping () -> () = {}) {
         request(path: "/BeoZone/Zone/Stream/Pause", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Pause/Release", method: "POST");
     }
 
-    public func stop(_ completion: @escaping () -> ()) {
+    public func stop(_ completion: @escaping () -> () = {}) {
         request(path: "/BeoZone/Zone/Stream/Stop", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Stop/Release", method: "POST");
     }
 
-    public func forward(_ completion: @escaping () -> ()) {
+    public func forward(_ completion: @escaping () -> () = {}) {
         request(path: "/BeoZone/Zone/Stream/Forward", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Forward/Release", method: "POST");
     }
 
-    public func backward(_ completion: @escaping () -> ()) {
+    public func backward(_ completion: @escaping () -> () = {}) {
         request(path: "/BeoZone/Zone/Stream/Backward", method: "POST", completion);
         request(path: "/BeoZone/Zone/Stream/Backward/Release", method: "POST");
     }
@@ -78,7 +78,7 @@ public class RemoteControl {
         request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completionData: completionData)
     }
 
-    public func setVolume(volume: Int, _ completion: @escaping () -> ()) {
+    public func setVolume(volume: Int, _ completion: @escaping () -> () = {}) {
         request(path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}", completion)
     }
 

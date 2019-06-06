@@ -2,7 +2,7 @@ import Foundation
 
 public class RemoteNotificationsSession : NSObject, URLSessionDataDelegate {
     private let url: URL
-    private let fragmentReader: (Data) -> ()
+    private let chunkReader: (Data) -> ()
     private let connectionCallback: (ConnectionState, String?) -> ()
     private var shutdown = false
     private var state = ConnectionState.offline
@@ -30,21 +30,21 @@ public class RemoteNotificationsSession : NSObject, URLSessionDataDelegate {
         case online = 5
     }
 
-    public init(url: URL, fragmentReader: @escaping (Data) -> (), connectionCallback: @escaping (ConnectionState, String?) -> ()) {
+    public init(url: URL, chunkReader: @escaping (Data) -> (), connectionCallback: @escaping (ConnectionState, String?) -> ()) {
         self.url = url
-        self.fragmentReader = fragmentReader
+        self.chunkReader = chunkReader
         self.connectionCallback = connectionCallback
     }
 
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        self.fragmentReader(data)
-
         if self.backoff != 1 {
             self.backoff = 1
             self.updateConnectionState(state: ConnectionState.online, message: "backoff reset to \(self.backoff)s")
         } else {
             self.updateConnectionState(state: ConnectionState.online)
         }
+
+        self.chunkReader(data)
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {

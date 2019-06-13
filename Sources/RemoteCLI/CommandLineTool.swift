@@ -2,7 +2,19 @@ import Foundation
 import RemoteCore
 
 public class CommandLineTool {
+    let remoteControl = RemoteControl()
+    let sema = DispatchSemaphore(value: 0)
+
+    private func block() {
+        sema.wait()
+    }
+
+    private func unblock() {
+        sema.signal();
+    }
+
     public let commands = [
+        "discover",
         "play",
         "pause",
         "stop",
@@ -15,16 +27,32 @@ public class CommandLineTool {
         "?",
     ]
 
-    public init() {}
+    public init() {
+        let host = UserDefaults.standard.string(forKey: "host")
+        if host != nil {
+            var port = UserDefaults.standard.integer(forKey: "port")
+            port = port > 0 ? port : 8080
+            self.remoteControl.setEndpoint(host: host!, port: port)
+        } else {
+            // Pick the first speakers found
+            var first = true
+            self.remoteControl.discover(unblock, callback: { service in 
+                if first {
+                    first = false
+                    self.remoteControl.setEndpoint(host: service.hostName!, port: service.port)
+                }
+            })
+
+            block()
+        }
+    }
 
     public func run(arguments: [String]) {
-        let sema = DispatchSemaphore(value: 0)
-        func block() {
-            sema.wait()
-        }
 
-        func unblock() {
-            sema.signal();
+        func foundSpeakers(_ service: NetService) {
+            print("name:", service.name)
+            print("host:", service.hostName!)
+            print("port:", service.port)
         }
 
         func volumeHandler(volume: Int?) {
@@ -51,38 +79,39 @@ public class CommandLineTool {
                 opt = Int(arguments[1])
             }
 
-            let remoteControl = RemoteControl()
-
             switch cmd {
+            case "discover":
+                self.remoteControl.discover(unblock, callback: foundSpeakers)
+                block()
             case "play":
-                remoteControl.play(unblock)
+                self.remoteControl.play(unblock)
                 block()
             case "pause":
-                remoteControl.pause(unblock)
+                self.remoteControl.pause(unblock)
                 block()
             case "stop":
-                remoteControl.stop(unblock)
+                self.remoteControl.stop(unblock)
                 block()
             case "forward":
-                remoteControl.forward(unblock)
+                self.remoteControl.forward(unblock)
                 block()
             case "backward":
-                remoteControl.backward(unblock)
+                self.remoteControl.backward(unblock)
                 block()
             case "getVolume":
-                remoteControl.getVolume(volumeHandler)
+                self.remoteControl.getVolume(volumeHandler)
                 block()
             case "setVolume":
                 if opt == nil {
                     fputs("  example:  setVolume 20\n", stderr)
                 } else {
-                    remoteControl.setVolume(volume: opt!, unblock)
+                    self.remoteControl.setVolume(volume: opt!, unblock)
                     block()
                 }
             case "receiveVolumeNotifications":
-                remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
+                self.remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
                 _ = readLine()
-                remoteControl.stopVolumeNotifications()
+                self.remoteControl.stopVolumeNotifications()
             case "help":
                 fallthrough
             case "?":

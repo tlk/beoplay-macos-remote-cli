@@ -2,18 +2,14 @@ import Foundation
 import SwiftyJSON
 
 public class RemoteControl {
-    private var components = URLComponents()
+    private var endpoint = URLComponents()
     private var remoteNotificationsSession: RemoteNotificationsSession?
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
 
-        self.components.scheme = UserDefaults.standard.string(forKey: "scheme") ?? "http"
-        self.components.host = UserDefaults.standard.string(forKey: "host") ?? "192.168.1.20"
-
-        let port = UserDefaults.standard.integer(forKey: "port")
-        self.components.port = port > 0 ? port : 8080
+        self.endpoint.scheme = "http"
     }
 
     private func request(path: String, 
@@ -22,7 +18,7 @@ public class RemoteControl {
             completionData: ((Data?) -> ())? = nil, 
             _ completion: (() -> ())? = nil) {
 
-        var urlComponents = self.components
+        var urlComponents = self.endpoint
         urlComponents.path = path
         var request = URLRequest(url: urlComponents.url!)
         request.httpMethod = method
@@ -34,6 +30,16 @@ public class RemoteControl {
         };
 
         task.resume()
+    }
+
+    public func discover(_ completion: @escaping () -> () = {}, callback: @escaping (NetService) -> ()) {
+        let bonjour = BonjourBrowser(completion, callback: callback)
+        bonjour.discoverServices()
+    }
+
+    public func setEndpoint(host: String, port: Int) {
+        self.endpoint.host = host
+        self.endpoint.port = port
     }
 
     public func play(_ completion: @escaping () -> () = {}) {
@@ -97,7 +103,7 @@ public class RemoteControl {
             }
         }
 
-        var urlComponents = self.components
+        var urlComponents = self.endpoint
         urlComponents.path = "/BeoNotify/Notifications"
         self.remoteNotificationsSession = RemoteNotificationsSession(url: urlComponents.url!, chunkReader: volumeChunkReader, connectionCallback: connectionUpdate)
         self.remoteNotificationsSession?.start()

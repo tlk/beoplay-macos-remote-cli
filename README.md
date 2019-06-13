@@ -9,17 +9,7 @@ $ make install
 swift build -c release
 [5/5] Linking ./.build/x86_64-apple-macosx/release/beoplay-cli
 cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
-defaults write beoplay-cli host 192.168.1.20     # (<-- change this to the loudspeakers ip address)
 $ 
-```
-
-## Configuration
-The loudspeakers are accessible through a web interface (fx http://192.168.1.20/index.fcgi) and `beoplay-cli` needs to know this IP address. You will have to do some discovery yourself if you do not already know what it is. Tip: check your router for a list of connected devices.
-
-When you know the IP address of the beoplay loudspeakers it must be stored in the `beoplay-cli` user preferences:
-
-```
-defaults write beoplay-cli host 192.168.1.20     # (<-- change this to the loudspeakers ip address)
 ```
 
 ## Usage
@@ -57,6 +47,18 @@ connection state: disconnecting
 connection state: offline
 > 
 > help
-available commands: ["play", "pause", "stop", "forward", "backward", "getVolume", "setVolume ", "receiveVolumeNotifications", "help", "?"]
+available commands: ["discover", "play", "pause", "stop", "forward", "backward", "getVolume", "setVolume ", "receiveVolumeNotifications", "help", "?"]
+> discover
+name: Beoplay M5 i køkkenet
+host: Beoplay-M5-28096178.local.
+port: 8080
 > 
+```
+
+## Configuration
+The command line utility is using [Bonjour](https://en.wikipedia.org/wiki/Bonjour_(software)) to discover available speakers on the local network and automatically connects to the first one found.
+
+This default behaviour can be overriden:
+```
+$ defaults write beoplay-cli host Beoplay-M5-28096178.local.
 ```

@@ -1,6 +1,6 @@
 # beoplay-cli
 
-This is an unofficial command line utility for Mac OS to remote control network enabled beoplay loudspeakers such as the Beoplay M5.
+This is an unofficial command line utility for Mac OS to remote control network enabled Beoplay loudspeakers.
 
 ## Installation
 
@@ -68,3 +68,4 @@ $ defaults write beoplay-cli host Beoplay-M5-28096178.local.
 - https://github.com/postlund/pyatv
 - https://github.com/jstasiak/python-zeroconf
 - https://github.com/andybest/linenoise-swift
+- https://github.com/tlk/beoplay-macos-remote-gui

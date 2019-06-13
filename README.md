@@ -62,3 +62,9 @@ This default behaviour can be overriden:
 ```
 $ defaults write beoplay-cli host Beoplay-M5-28096178.local.
 ```
+
+## Credits & Related Projects
+- https://github.com/martonborzak/ha-beoplay
+- https://github.com/postlund/pyatv
+- https://github.com/jstasiak/python-zeroconf
+- https://github.com/andybest/linenoise-swift

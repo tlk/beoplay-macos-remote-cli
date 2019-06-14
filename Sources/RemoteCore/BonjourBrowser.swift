@@ -26,7 +26,7 @@ class BonjourBrowser : NSObject, NetServiceBrowserDelegate {
         self.browser.delegate = self
         self.browser.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
         self.browser.searchForServices(ofType: self.serviceType, inDomain: self.domain)
-        CFRunLoopRunInMode(CFRunLoopMode.defaultMode, self.timeout, true)
+        CFRunLoopRunInMode(CFRunLoopMode.defaultMode, self.timeout, false)
         self.completion()
     }
 

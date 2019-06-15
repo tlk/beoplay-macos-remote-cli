@@ -55,13 +55,17 @@ public class CommandLineTool {
             print("port:", service.port)
         }
 
+        func volumeHandlerUnblock(volume: Int?) {
+            volumeHandler(volume: volume)
+            unblock()
+        }
+
         func volumeHandler(volume: Int?) {
             if volume == nil {
                 fputs("no volume level reading\n", stderr)
             } else {
                 print(volume!)
             }
-            unblock()
         }
 
         func connectionHandler(state: RemoteNotificationsSession.ConnectionState, message: String?) {
@@ -99,7 +103,7 @@ public class CommandLineTool {
                 self.remoteControl.backward(unblock)
                 block()
             case "getVolume":
-                self.remoteControl.getVolume(volumeHandler)
+                self.remoteControl.getVolume(volumeHandlerUnblock)
                 block()
             case "setVolume":
                 if opt == nil {

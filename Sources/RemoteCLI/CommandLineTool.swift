@@ -132,7 +132,7 @@ public class CommandLineTool {
             case "tuneIn":
                 if opt == nil {
                     fputs("  example:  tunein s24861   (DR P3)\n", stderr)
-                    fputs("                   s3730    (DR P4)\n", stderr)
+                    fputs("                   s37309   (DR P4)\n", stderr)
                     fputs("                   s69060   (DR P5)\n", stderr)
                     fputs("                   s45455   (DR P6)\n", stderr)
                     fputs("                   s69056   (DR P7)\n", stderr)

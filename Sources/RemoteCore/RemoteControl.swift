@@ -12,19 +12,38 @@ public class RemoteControl {
         self.endpoint.scheme = "http"
     }
 
-    private func request(path: String, 
-            method: String, 
+    private func request(method: String,
+            path: String,
+            query: String? = nil,
             body: String? = nil, 
             completionData: ((Data?) -> ())? = nil, 
             _ completion: (() -> ())? = nil) {
 
         var urlComponents = self.endpoint
         urlComponents.path = path
+        urlComponents.query = query
+        
         var request = URLRequest(url: urlComponents.url!)
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = method
         request.httpBody = body?.data(using: .utf8)
 
+        print("request: \(request)")
+
+        // let session: URLSession = {
+        //     let configuration = URLSessionConfiguration.default
+        //     configuration.connectionProxyDictionary = [AnyHashable: Any]()
+        //     configuration.connectionProxyDictionary?[kCFNetworkProxiesHTTPEnable as String] = 1
+        //     configuration.connectionProxyDictionary?[kCFNetworkProxiesHTTPProxy as String] = "192.168.1.232"
+        //     configuration.connectionProxyDictionary?[kCFNetworkProxiesHTTPPort as String] = 8080
+        //     return URLSession(configuration: configuration)
+        // }()
+
+        //let task = session.dataTask(with: request) { (data, response, error) in
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            let debug = JSON(data!)
+            print ("response: \(debug)")
+
             completionData?(data)
             completion?()
         };
@@ -43,28 +62,28 @@ public class RemoteControl {
     }
 
     public func play(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Play", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Play/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Play", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Play/Release");
     }
 
     public func pause(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Pause", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Pause/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Pause", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Pause/Release");
     }
 
     public func stop(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Stop", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Stop/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Stop", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Stop/Release");
     }
 
     public func forward(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Forward", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Forward/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Forward", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Forward/Release");
     }
 
     public func backward(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Backward", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Backward/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Backward", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Backward/Release");
     }
 
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
@@ -81,11 +100,11 @@ public class RemoteControl {
             completion(vol)
         }
 
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completionData: completionData)
+        request(method: "GET", path: "/BeoZone/Zone/Sound/Volume/Speaker/", completionData: completionData)
     }
 
     public func setVolume(volume: Int, _ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}", completion)
+        request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", body: "{\"level\":\(volume)}", completion)
     }
 
     public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> (), connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState, String?) -> ()) {
@@ -112,4 +131,87 @@ public class RemoteControl {
     public func stopVolumeNotifications() {
         self.remoteNotificationsSession?.stop()
     }
+
+    public func getSources(_ completion: @escaping (Dictionary<String, String>) -> ()) {
+        func completionData(data: Data?) {
+            var sources: [String: String] = [:]
+
+            if let json = try? JSON(data: data!) {
+                for (_, source) in json["sources"] {
+                    let friendlyName = source[1]["friendlyName"].string
+                    let id = source[1]["id"].string
+                    sources[friendlyName!] = id
+                }
+            }
+
+            completion(sources)
+        }
+
+        request(method: "GET", path: "/BeoZone/Zone/Sources/", completionData: completionData)
+    }
+
+    public func setPrimaryExperience(sourceId: String, _ completion: @escaping () -> () = {}) {
+        let json: JSON =
+        [
+            "primaryExperience": [
+                "source": [
+                    "id": sourceId
+                ]
+            ]
+        ]
+        let jsonString: String? = json.rawString([.castNilToNSNull: true])
+        print("json: \(jsonString!)")
+
+        request(method: "DELETE", path: "/BeoZone/Zone/ActiveSources/primaryExperience");
+        request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: jsonString, completion);
+    }
+
+    public func startRadio(_ completion: @escaping () -> () = {}) {
+        //let tuneinId = "p1134968"
+        let tuneinId = "s45455"
+        let json: JSON =
+        [
+            "playQueueItem": [
+                "behaviour": "planned",
+                "id": tuneinId,
+                "station": [
+                    "id": tuneinId,
+                    "image": [
+                        [
+                            "mediatype": "image/jpg",
+                            "size": "medium",
+                            "url": "https://cdn-profiles.tunein.com/s45455/images/logog.png"
+                        ]                
+                    ],
+                    "name": "DR P6 Beat",
+                    "tuneIn": [ 
+                        "location": "",
+                        "stationId": tuneinId
+                    ]
+                ]
+            ]
+        ]
+//         let json: JSON =
+// [
+//     "playQueueItem": [
+//         "behaviour": "planned",
+//         "favoriteList": [
+//             "id": "id%3Df1",
+//             "name": "General",
+//             "netRadio": [
+//                 "name": "General"
+//             ],
+//             "numberOfItems": 0,
+//             "primary": false
+//         ],
+//         "playNowOffset": 0
+//     ]
+// ]
+
+        request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
+        let jsonString: String? = json.rawString([.castNilToNSNull: true])
+        print("json: \(jsonString!)")
+        request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: jsonString, completion);
+    }
+
 }

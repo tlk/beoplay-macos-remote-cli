@@ -23,6 +23,9 @@ public class CommandLineTool {
         "getVolume",
         "setVolume ",
         "receiveVolumeNotifications",
+        "startRadio",
+        "setPrimaryExperience",
+        "leavePrimaryExperience",
         "help",
         "?",
     ]
@@ -116,6 +119,21 @@ public class CommandLineTool {
                 self.remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
                 _ = readLine()
                 self.remoteControl.stopVolumeNotifications()
+            case "getSources":
+                self.remoteControl.getSources { sources in
+                    let keys = Array(sources.keys)
+                    for key in keys.sorted() {
+                        print("source: \(key), \(sources[key]!)")
+                    }
+                    self.unblock()
+                }
+                block()
+            case "startRadio":
+                self.remoteControl.startRadio(unblock)
+                block()
+            case "setPrimaryExperience":
+                self.remoteControl.setPrimaryExperience(sourceId: arguments[1], unblock)
+                block()
             case "help":
                 fallthrough
             case "?":

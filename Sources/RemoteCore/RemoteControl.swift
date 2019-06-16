@@ -41,7 +41,7 @@ public class RemoteControl {
 
         //let task = session.dataTask(with: request) { (data, response, error) in
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            let debug = JSON(data!)
+            // let debug = JSON(data!)
             // print ("response: \(debug)")
 
             completionData?(data)
@@ -166,9 +166,8 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: jsonString, completion);
     }
 
-    public func startRadio(id: Int, _ completion: @escaping () -> () = {}) {
+    public func tuneIn(id: Int, _ completion: @escaping () -> () = {}) {
         let tuneInId = "s\(id)"
-        print("startRadio:", tuneInId)
         let json: JSON =
         [
             "playQueueItem": [
@@ -180,10 +179,10 @@ public class RemoteControl {
                         [
                             "mediatype": "image/jpg",
                             "size": "medium",
-                            "url": "https://cdn-profiles.tunein.com/s45455/images/logog.png"
+                            "url": "https://cdn-profiles.tunein.com/s45455/images/logog.png?tlk_was_here"
                         ]                
                     ],
-                    "name": "DR P6 Beat",
+                    "name": "tlk was here",
                     "tuneIn": [ 
                         "location": "",
                         "stationId": tuneInId

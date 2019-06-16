@@ -23,7 +23,7 @@ public class CommandLineTool {
         "getVolume",
         "setVolume ",
         "receiveVolumeNotifications",
-        "startRadio",
+        "tuneIn ",
         "setPrimaryExperience",
         "leavePrimaryExperience",
         "help",
@@ -129,16 +129,16 @@ public class CommandLineTool {
                     self.unblock()
                 }
                 block()
-            case "startRadio":
+            case "tuneIn":
                 if opt == nil {
-                    fputs("  example:  startRadio s24861   (DR P3)\n", stderr)
-                    fputs("                       s37309   (DR P4)\n", stderr)
-                    fputs("                       s69060   (DR P5)\n", stderr)
-                    fputs("                       s45455   (DR P6)\n", stderr)
-                    fputs("                       s69056   (DR P7)\n", stderr)
-                    fputs("                       s148845  (Radio24syv)\n", stderr)
+                    fputs("  example:  tunein s24861   (DR P3)\n", stderr)
+                    fputs("                   s3730    (DR P4)\n", stderr)
+                    fputs("                   s69060   (DR P5)\n", stderr)
+                    fputs("                   s45455   (DR P6)\n", stderr)
+                    fputs("                   s69056   (DR P7)\n", stderr)
+                    fputs("                   s148845  (Radio24syv)\n", stderr)
                 } else {
-                    self.remoteControl.startRadio(id: opt!, unblock)
+                    self.remoteControl.tuneIn(id: opt!, unblock)
                     block()
                 }
             case "setPrimaryExperience":

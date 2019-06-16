@@ -83,7 +83,8 @@ public class CommandLineTool {
             let cmd = arguments[0]
             var opt: Int? = nil
             if arguments.indices.contains(1) {
-                opt = Int(arguments[1])
+                let digits = arguments[1].filter("01234567890.".contains)
+                opt = Int(digits)
             }
 
             switch cmd {
@@ -129,8 +130,17 @@ public class CommandLineTool {
                 }
                 block()
             case "startRadio":
-                self.remoteControl.startRadio(unblock)
-                block()
+                if opt == nil {
+                    fputs("  example:  startRadio s24861   (DR P3)\n", stderr)
+                    fputs("                       s37309   (DR P4)\n", stderr)
+                    fputs("                       s69060   (DR P5)\n", stderr)
+                    fputs("                       s45455   (DR P6)\n", stderr)
+                    fputs("                       s69056   (DR P7)\n", stderr)
+                    fputs("                       s148845  (Radio24syv)\n", stderr)
+                } else {
+                    self.remoteControl.startRadio(id: opt!, unblock)
+                    block()
+                }
             case "setPrimaryExperience":
                 self.remoteControl.setPrimaryExperience(sourceId: arguments[1], unblock)
                 block()

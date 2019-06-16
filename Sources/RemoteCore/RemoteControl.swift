@@ -28,7 +28,7 @@ public class RemoteControl {
         request.httpMethod = method
         request.httpBody = body?.data(using: .utf8)
 
-        print("request: \(request)")
+        // print("request: \(request)")
 
         // let session: URLSession = {
         //     let configuration = URLSessionConfiguration.default
@@ -42,7 +42,7 @@ public class RemoteControl {
         //let task = session.dataTask(with: request) { (data, response, error) in
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             let debug = JSON(data!)
-            print ("response: \(debug)")
+            // print ("response: \(debug)")
 
             completionData?(data)
             completion?()
@@ -166,16 +166,16 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: jsonString, completion);
     }
 
-    public func startRadio(_ completion: @escaping () -> () = {}) {
-        //let tuneinId = "p1134968"
-        let tuneinId = "s45455"
+    public func startRadio(id: Int, _ completion: @escaping () -> () = {}) {
+        let tuneInId = "s\(id)"
+        print("startRadio:", tuneInId)
         let json: JSON =
         [
             "playQueueItem": [
                 "behaviour": "planned",
-                "id": tuneinId,
+                "id": tuneInId,
                 "station": [
-                    "id": tuneinId,
+                    "id": tuneInId,
                     "image": [
                         [
                             "mediatype": "image/jpg",
@@ -186,31 +186,14 @@ public class RemoteControl {
                     "name": "DR P6 Beat",
                     "tuneIn": [ 
                         "location": "",
-                        "stationId": tuneinId
+                        "stationId": tuneInId
                     ]
                 ]
             ]
         ]
-//         let json: JSON =
-// [
-//     "playQueueItem": [
-//         "behaviour": "planned",
-//         "favoriteList": [
-//             "id": "id%3Df1",
-//             "name": "General",
-//             "netRadio": [
-//                 "name": "General"
-//             ],
-//             "numberOfItems": 0,
-//             "primary": false
-//         ],
-//         "playNowOffset": 0
-//     ]
-// ]
 
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
         let jsonString: String? = json.rawString([.castNilToNSNull: true])
-        print("json: \(jsonString!)")
         request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: jsonString, completion);
     }
 

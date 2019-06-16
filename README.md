@@ -69,3 +69,4 @@ $ defaults write beoplay-cli host Beoplay-M5-28096178.local.
 - https://github.com/jstasiak/python-zeroconf
 - https://github.com/andybest/linenoise-swift
 - https://github.com/tlk/beoplay-macos-remote-gui
+

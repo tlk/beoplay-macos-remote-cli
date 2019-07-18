@@ -22,28 +22,13 @@ public class RemoteControl {
         var urlComponents = self.endpoint
         urlComponents.path = path
         urlComponents.query = query
-        
+
         var request = URLRequest(url: urlComponents.url!)
         request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = method
         request.httpBody = body?.data(using: .utf8)
 
-        // print("request: \(request)")
-
-        // let session: URLSession = {
-        //     let configuration = URLSessionConfiguration.default
-        //     configuration.connectionProxyDictionary = [AnyHashable: Any]()
-        //     configuration.connectionProxyDictionary?[kCFNetworkProxiesHTTPEnable as String] = 1
-        //     configuration.connectionProxyDictionary?[kCFNetworkProxiesHTTPProxy as String] = "192.168.1.232"
-        //     configuration.connectionProxyDictionary?[kCFNetworkProxiesHTTPPort as String] = 8080
-        //     return URLSession(configuration: configuration)
-        // }()
-
-        //let task = session.dataTask(with: request) { (data, response, error) in
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            // let debug = JSON(data!)
-            // print ("response: \(debug)")
-
             completionData?(data)
             completion?()
         };

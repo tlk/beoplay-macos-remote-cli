@@ -144,5 +144,4 @@ public class RemoteControl {
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
         request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion);
     }
-
 }

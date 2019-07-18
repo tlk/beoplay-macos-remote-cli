@@ -14,13 +14,17 @@ public class RemoteControl {
 
     private func request(method: String,
             path: String,
+            query: String? = nil,
             body: String? = nil, 
             completionData: ((Data?) -> ())? = nil, 
             _ completion: (() -> ())? = nil) {
 
         var urlComponents = self.endpoint
         urlComponents.path = path
+        urlComponents.query = query
+
         var request = URLRequest(url: urlComponents.url!)
+        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = method
         request.httpBody = body?.data(using: .utf8)
 
@@ -111,5 +115,33 @@ public class RemoteControl {
 
     public func stopVolumeNotifications() {
         self.remoteNotificationsSession?.stop()
+    }
+
+    public func tuneIn(id: String, _ completion: @escaping () -> () = {}) {
+        let payload = JSON(
+        [
+            "playQueueItem": [
+                "behaviour": "planned",
+                "id": id,
+                "station": [
+                    "id": id,
+                    "image": [
+                        [
+                            "mediatype": "image/jpg",
+                            "size": "medium",
+                            "url": ""
+                        ]
+                    ],
+                    "name": "",
+                    "tuneIn": [
+                        "location": "",
+                        "stationId": id
+                    ]
+                ]
+            ]
+        ]).rawString()!
+
+        request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
+        request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion);
     }
 }

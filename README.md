@@ -47,7 +47,7 @@ connection state: disconnecting
 connection state: offline
 > 
 > help
-available commands: ["discover", "play", "pause", "stop", "forward", "backward", "getVolume", "setVolume ", "receiveVolumeNotifications", "help", "?"]
+available commands: ["discover", "play", "pause", "stop", "forward", "backward", "getVolume", "setVolume ", "receiveVolumeNotifications", "tuneIn ", "help", "?"]
 > discover
 name: Beoplay M5 i køkkenet
 host: Beoplay-M5-28096178.local.

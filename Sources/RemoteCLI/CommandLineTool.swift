@@ -23,6 +23,7 @@ public class CommandLineTool {
         "getVolume",
         "setVolume ",
         "receiveVolumeNotifications",
+        "tuneIn ",
         "help",
         "?",
     ]
@@ -78,10 +79,6 @@ public class CommandLineTool {
 
         if (arguments.indices.contains(0)) {
             let cmd = arguments[0]
-            var opt: Int? = nil
-            if arguments.indices.contains(1) {
-                opt = Int(arguments[1])
-            }
 
             switch cmd {
             case "discover":
@@ -106,6 +103,7 @@ public class CommandLineTool {
                 self.remoteControl.getVolume(volumeHandlerUnblock)
                 block()
             case "setVolume":
+                let opt: Int? = Int(arguments[1])
                 if opt == nil {
                     fputs("  example:  setVolume 20\n", stderr)
                 } else {
@@ -116,6 +114,23 @@ public class CommandLineTool {
                 self.remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
                 _ = readLine()
                 self.remoteControl.stopVolumeNotifications()
+            case "tuneIn":
+                var opt: String? = nil
+                if arguments.indices.contains(1) && arguments[1].range(of: #"^s[0-9]+$"#, options: .regularExpression) != nil {
+                    opt = arguments[1]
+                }
+
+                if opt == nil {
+                    fputs("  example:  tuneIn s24861   (DR P3)\n", stderr)
+                    fputs("                   s37309   (DR P4)\n", stderr)
+                    fputs("                   s69060   (DR P5)\n", stderr)
+                    fputs("                   s45455   (DR P6)\n", stderr)
+                    fputs("                   s69056   (DR P7)\n", stderr)
+                    fputs("                   s148845  (Radio24syv)\n", stderr)
+                } else {
+                    self.remoteControl.tuneIn(id: opt!, unblock)
+                    block()
+                }
             case "help":
                 fallthrough
             case "?":

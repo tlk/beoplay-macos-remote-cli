@@ -81,11 +81,6 @@ public class CommandLineTool {
 
         if (arguments.indices.contains(0)) {
             let cmd = arguments[0]
-            var opt: Int? = nil
-            if arguments.indices.contains(1) {
-                let digits = arguments[1].filter("01234567890.".contains)
-                opt = Int(digits)
-            }
 
             switch cmd {
             case "discover":
@@ -110,6 +105,7 @@ public class CommandLineTool {
                 self.remoteControl.getVolume(volumeHandlerUnblock)
                 block()
             case "setVolume":
+                let opt: Int? = Int(arguments[1])
                 if opt == nil {
                     fputs("  example:  setVolume 20\n", stderr)
                 } else {
@@ -130,6 +126,11 @@ public class CommandLineTool {
                 }
                 block()
             case "tuneIn":
+                var opt: String? = nil
+                if arguments.indices.contains(1) && arguments[1].range(of: #"^s[0-9]+$"#, options: .regularExpression) != nil {
+                    opt = arguments[1]
+                }
+
                 if opt == nil {
                     fputs("  example:  tunein s24861   (DR P3)\n", stderr)
                     fputs("                   s37309   (DR P4)\n", stderr)

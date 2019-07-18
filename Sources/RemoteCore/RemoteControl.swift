@@ -166,34 +166,33 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: jsonString, completion);
     }
 
-    public func tuneIn(id: Int, _ completion: @escaping () -> () = {}) {
-        let tuneInId = "s\(id)"
+    public func tuneIn(id: String, _ completion: @escaping () -> () = {}) {
         let json: JSON =
         [
             "playQueueItem": [
                 "behaviour": "planned",
-                "id": tuneInId,
+                "id": id,
                 "station": [
-                    "id": tuneInId,
+                    "id": id,
                     "image": [
                         [
                             "mediatype": "image/jpg",
                             "size": "medium",
-                            "url": "https://cdn-profiles.tunein.com/s45455/images/logog.png?tlk_was_here"
+                            "url": ""
                         ]                
                     ],
-                    "name": "tlk was here",
+                    "name": "",
                     "tuneIn": [ 
                         "location": "",
-                        "stationId": tuneInId
+                        "stationId": id
                     ]
                 ]
             ]
         ]
+        let str: String? = json.rawString([.castNilToNSNull: true])
 
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
-        let jsonString: String? = json.rawString([.castNilToNSNull: true])
-        request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: jsonString, completion);
+        request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: str, completion);
     }
 
 }

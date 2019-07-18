@@ -12,8 +12,8 @@ public class RemoteControl {
         self.endpoint.scheme = "http"
     }
 
-    private func request(path: String, 
-            method: String, 
+    private func request(method: String,
+            path: String,
             body: String? = nil, 
             completionData: ((Data?) -> ())? = nil, 
             _ completion: (() -> ())? = nil) {
@@ -43,28 +43,28 @@ public class RemoteControl {
     }
 
     public func play(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Play", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Play/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Play", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Play/Release");
     }
 
     public func pause(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Pause", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Pause/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Pause", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Pause/Release");
     }
 
     public func stop(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Stop", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Stop/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Stop", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Stop/Release");
     }
 
     public func forward(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Forward", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Forward/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Forward", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Forward/Release");
     }
 
     public func backward(_ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Stream/Backward", method: "POST", completion);
-        request(path: "/BeoZone/Zone/Stream/Backward/Release", method: "POST");
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Backward", completion);
+        request(method: "POST", path: "/BeoZone/Zone/Stream/Backward/Release");
     }
 
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
@@ -81,11 +81,11 @@ public class RemoteControl {
             completion(vol)
         }
 
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/", method: "GET", completionData: completionData)
+        request(method: "GET", path: "/BeoZone/Zone/Sound/Volume/Speaker/", completionData: completionData)
     }
 
     public func setVolume(volume: Int, _ completion: @escaping () -> () = {}) {
-        request(path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", method: "PUT", body: "{\"level\":\(volume)}", completion)
+        request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", body: "{\"level\":\(volume)}", completion)
     }
 
     public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> (), connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState, String?) -> ()) {

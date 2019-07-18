@@ -164,10 +164,10 @@ public class RemoteControl {
                             "mediatype": "image/jpg",
                             "size": "medium",
                             "url": ""
-                        ]                
+                        ]
                     ],
                     "name": "",
-                    "tuneIn": [ 
+                    "tuneIn": [
                         "location": "",
                         "stationId": id
                     ]

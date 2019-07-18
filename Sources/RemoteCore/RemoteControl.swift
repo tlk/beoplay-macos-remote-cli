@@ -152,7 +152,7 @@ public class RemoteControl {
     }
 
     public func tuneIn(id: String, _ completion: @escaping () -> () = {}) {
-        let json: JSON =
+        let payload = JSON(
         [
             "playQueueItem": [
                 "behaviour": "planned",
@@ -173,11 +173,10 @@ public class RemoteControl {
                     ]
                 ]
             ]
-        ]
-        let str: String? = json.rawString([.castNilToNSNull: true])
+        ]).rawString()!
 
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
-        request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: str, completion);
+        request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion);
     }
 
 }

@@ -117,40 +117,6 @@ public class RemoteControl {
         self.remoteNotificationsSession?.stop()
     }
 
-    public func getSources(_ completion: @escaping (Dictionary<String, String>) -> ()) {
-        func completionData(data: Data?) {
-            var sources: [String: String] = [:]
-
-            if let json = try? JSON(data: data!) {
-                for (_, source) in json["sources"] {
-                    let friendlyName = source[1]["friendlyName"].string
-                    let id = source[1]["id"].string
-                    sources[friendlyName!] = id
-                }
-            }
-
-            completion(sources)
-        }
-
-        request(method: "GET", path: "/BeoZone/Zone/Sources/", completionData: completionData)
-    }
-
-    public func setPrimaryExperience(sourceId: String, _ completion: @escaping () -> () = {}) {
-        let json: JSON =
-        [
-            "primaryExperience": [
-                "source": [
-                    "id": sourceId
-                ]
-            ]
-        ]
-        let jsonString: String? = json.rawString([.castNilToNSNull: true])
-        print("json: \(jsonString!)")
-
-        request(method: "DELETE", path: "/BeoZone/Zone/ActiveSources/primaryExperience");
-        request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: jsonString, completion);
-    }
-
     public func tuneIn(id: String, _ completion: @escaping () -> () = {}) {
         let payload = JSON(
         [

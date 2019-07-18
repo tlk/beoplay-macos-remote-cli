@@ -24,8 +24,6 @@ public class CommandLineTool {
         "setVolume ",
         "receiveVolumeNotifications",
         "tuneIn ",
-        "setPrimaryExperience",
-        "leavePrimaryExperience",
         "help",
         "?",
     ]
@@ -116,15 +114,6 @@ public class CommandLineTool {
                 self.remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler, connectionUpdate: connectionHandler)
                 _ = readLine()
                 self.remoteControl.stopVolumeNotifications()
-            case "getSources":
-                self.remoteControl.getSources { sources in
-                    let keys = Array(sources.keys)
-                    for key in keys.sorted() {
-                        print("source: \(key), \(sources[key]!)")
-                    }
-                    self.unblock()
-                }
-                block()
             case "tuneIn":
                 var opt: String? = nil
                 if arguments.indices.contains(1) && arguments[1].range(of: #"^s[0-9]+$"#, options: .regularExpression) != nil {
@@ -142,9 +131,6 @@ public class CommandLineTool {
                     self.remoteControl.tuneIn(id: opt!, unblock)
                     block()
                 }
-            case "setPrimaryExperience":
-                self.remoteControl.setPrimaryExperience(sourceId: arguments[1], unblock)
-                block()
             case "help":
                 fallthrough
             case "?":

@@ -1,6 +1,8 @@
 # beoplay-cli
 
-This is an unofficial command line utility for Mac OS to remote control network enabled Beoplay loudspeakers.
+This is an unofficial Command Line Interface for macOS to remote control network enabled Beoplay loudspeakers.
+
+The CLI is built on top of the [RemoteCore](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCore) library which is also used by the [Beoplay Remote](https://github.com/tlk/beoplay-macos-remote-gui) menu bar app for macOS.
 
 ## Installation
 

@@ -16,46 +16,30 @@ $
 
 ## Usage
 
-#### Command line arguments
+#### Non-interactive mode
 ```
 $ beoplay-cli getVolume
 35
-$ beoplay-cli setVolume 30
+$ beoplay-cli setVolume 20
 $ beoplay-cli getVolume
-30
+20
 $ beoplay-cli pause
 $ beoplay-cli play
-$ 
-```
-
-#### Interactive mode (with hints and tab-completion)
-```
-$ beoplay-cli
-> getVolume
-30
-> setVolume 35
-> getVolume
-35
-> 
-> receiveVolumeNotifications
+$ beoplay-cli receiveVolumeNotifications
 connection state: connecting
 connection state: online
-36
-38
-39
-40
+20
+25
+28
+30
 
 connection state: disconnecting
 connection state: offline
-> 
-> help
-available commands: ["discover", "play", "pause", "stop", "forward", "backward", "getVolume", "setVolume ", "receiveVolumeNotifications", "tuneIn ", "help", "?"]
-> discover
-name: Beoplay M5 i køkkenet
-host: Beoplay-M5-28096178.local.
-port: 8080
-> 
+$ 
 ```
+
+#### Interactive mode with hints and tab-completion
+![screen recording](./tty.gif)
 
 ## Configuration
 The command line utility is using [Bonjour](https://en.wikipedia.org/wiki/Bonjour_(software)) to discover available speakers on the local network and automatically connects to the first one found.

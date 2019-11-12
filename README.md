@@ -16,6 +16,9 @@ $
 
 ## Usage
 
+#### Interactive mode with hints and tab-completion
+![screen recording](./tty.gif)
+
 #### Non-interactive mode
 ```
 $ beoplay-cli getVolume
@@ -38,14 +41,15 @@ connection state: offline
 $ 
 ```
 
-#### Interactive mode with hints and tab-completion
-![screen recording](./tty.gif)
-
 ## Configuration
 The command line utility is using [Bonjour](https://en.wikipedia.org/wiki/Bonjour_(software)) to discover available speakers on the local network and automatically connects to the first one found.
 
 This default behaviour can be overriden:
 ```
+$ beoplay-cli discover
+name: Beoplay M5 i køkkenet
+host: Beoplay-M5-28096178.local.
+port: 8080
 $ defaults write beoplay-cli host Beoplay-M5-28096178.local.
 ```
 

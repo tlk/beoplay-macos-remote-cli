@@ -15,6 +15,8 @@ public class CommandLineTool {
 
     public let commands = [
         "discover",
+        "getSources",
+        "setSource ",
         "play",
         "pause",
         "stop",
@@ -56,6 +58,21 @@ public class CommandLineTool {
             print("port:", service.port)
         }
 
+        func sourcesHandler(sources: [[String]]) {
+            if sources.isEmpty {
+                fputs("failed to get sources\n", stderr)
+            } else {
+                for source in sources {
+                    // let id = source[0]
+                    // let type = source[1]
+                    // let category = source[2]
+                    // let name = source[3]
+                    print(source.joined(separator: ", "))
+                }
+            }
+            unblock()
+        }
+
         func volumeHandlerUnblock(volume: Int?) {
             volumeHandler(volume: volume)
             unblock()
@@ -63,7 +80,7 @@ public class CommandLineTool {
 
         func volumeHandler(volume: Int?) {
             if volume == nil {
-                fputs("no volume level reading\n", stderr)
+                fputs("failed to get volume level\n", stderr)
             } else {
                 print(volume!)
             }
@@ -84,6 +101,21 @@ public class CommandLineTool {
             case "discover":
                 self.remoteControl.discover(unblock, callback: foundSpeakers)
                 block()
+            case "getSources":
+                self.remoteControl.getSources(sourcesHandler)
+                block()
+            case "setSource":
+                var opt: String? = nil
+                if arguments.indices.contains(1) && arguments[1].range(of: #"^\w+:.+"#, options: .regularExpression) != nil {
+                    opt = arguments[1]
+                }
+
+                if opt == nil {
+                    fputs("  example:  setSource spotify:2714.1200304.28096178@products.bang-olufsen.com\n", stderr)
+                } else {
+                    self.remoteControl.setSource(id: opt!, unblock)
+                    block()
+                }
             case "play":
                 self.remoteControl.play(unblock)
                 block()

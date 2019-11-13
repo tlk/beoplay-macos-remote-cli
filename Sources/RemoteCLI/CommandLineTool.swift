@@ -31,18 +31,37 @@ public class CommandLineTool {
     ]
 
     public init() {
-        let host = UserDefaults.standard.string(forKey: "host")
+        var host: String? = UserDefaults.standard.string(forKey: "host")
+        var port: Int = UserDefaults.standard.integer(forKey: "port")
+        var debug = false
+
+        func connect(host: String, port: Int) {
+            if debug {
+                print("connecting to http://\(host):\(port)")
+            }
+            self.remoteControl.setEndpoint(host: host, port: port)
+        }
+
+        if let envHost = ProcessInfo.processInfo.environment["BEOPLAY_HOST"] {
+            host = envHost
+            debug = true
+        }
+
+        if let envPort = ProcessInfo.processInfo.environment["BEOPLAY_PORT"] {
+            port = Int(envPort)!
+            debug = true
+        }
+
         if host != nil {
-            var port = UserDefaults.standard.integer(forKey: "port")
             port = port > 0 ? port : 8080
-            self.remoteControl.setEndpoint(host: host!, port: port)
+            connect(host: host!, port: port)
         } else {
             // Pick the first speakers found
             var first = true
             self.remoteControl.discover(unblock, callback: { service in 
                 if first {
                     first = false
-                    self.remoteControl.setEndpoint(host: service.hostName!, port: service.port)
+                    connect(host: service.hostName!, port: service.port)
                 }
             })
 

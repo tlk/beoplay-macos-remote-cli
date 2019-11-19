@@ -1,9 +1,9 @@
 
 public struct BeoplaySource {
-    let id: String
-    let sourceType: String
-    let category: String
-    let friendlyName: String
-    let productBorrowed: Bool // 🔗
-    let productFriendlyName: String
+    public let id: String
+    public let sourceType: String
+    public let category: String
+    public let friendlyName: String
+    public let productBorrowed: Bool // 🔗
+    public let productFriendlyName: String
 }

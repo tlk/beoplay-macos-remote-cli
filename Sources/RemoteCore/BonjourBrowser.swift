@@ -3,7 +3,7 @@ import Foundation
 class BonjourBrowser : NSObject, NetServiceBrowserDelegate {
     let serviceType = "_beoremote._tcp."
     let domain = "local."
-    let timeout: CFTimeInterval = 1
+    let timeout: CFTimeInterval = 10
 
     var callback: (NetService) -> ()
     var completion: () -> () = {}

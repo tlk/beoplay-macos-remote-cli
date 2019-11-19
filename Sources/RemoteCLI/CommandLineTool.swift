@@ -60,10 +60,11 @@ public class CommandLineTool {
         } else {
             // Pick the first speakers found
             var first = true
-            self.remoteControl.discover(unblock, callback: { service in 
+            self.remoteControl.discover({}, callback: { service in 
                 if first {
                     first = false
                     connect(host: service.hostName!, port: service.port)
+                    self.unblock()
                 }
             })
 

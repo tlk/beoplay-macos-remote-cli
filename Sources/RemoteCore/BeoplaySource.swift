@@ -4,6 +4,6 @@ public struct BeoplaySource {
     public let sourceType: String
     public let category: String
     public let friendlyName: String
-    public let productBorrowed: Bool // 🔗
+    public let borrowed: Bool // 🔗
     public let productFriendlyName: String
 }

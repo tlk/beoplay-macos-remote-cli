@@ -35,9 +35,9 @@ public class DeviceEmulator {
                         "sourceType": ["type": "TUNEIN"],
                         "category": "RADIO",
                         "friendlyName": "TuneIn",
+                        "borrowed": false,
                         "product": 
                         [
-                            "borrowed": "false",
                             "friendlyName": self.getName()
                         ]
                     ]
@@ -49,9 +49,9 @@ public class DeviceEmulator {
                         "sourceType": ["type": "LINE IN"],
                         "category": "MUSIC",
                         "friendlyName": "Line-In",
+                        "borrowed": false,
                         "product": 
                         [
-                            "borrowed": "false",
                             "friendlyName": self.getName()
                         ]
                     ]
@@ -63,9 +63,9 @@ public class DeviceEmulator {
                         "sourceType": ["type": "ALARM"],
                         "category": "ALARM",
                         "friendlyName": "Alarm",
+                        "borrowed": false,
                         "product": 
                         [
-                            "borrowed": "false",
                             "friendlyName": self.getName()
                         ]
                     ]
@@ -77,9 +77,9 @@ public class DeviceEmulator {
                         "sourceType": ["type": "SPOTIFY"],
                         "category": "MUSIC",
                         "friendlyName": "Spotify",
+                        "borrowed": true,
                         "product": 
                         [
-                            "borrowed": "true",
                             "friendlyName": "Living Room"
                         ]
                     ]

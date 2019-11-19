@@ -58,7 +58,7 @@ public class RemoteControl {
                             sourceType: source[1]["sourceType"]["type"].stringValue,
                             category: source[1]["category"].stringValue,
                             friendlyName: source[1]["friendlyName"].stringValue,
-                            productBorrowed: source[1]["product"]["borrowed"].boolValue,
+                            borrowed: source[1]["borrowed"].boolValue,
                             productFriendlyName: source[1]["product"]["friendlyName"].stringValue
                         )
                         sources.append(source)

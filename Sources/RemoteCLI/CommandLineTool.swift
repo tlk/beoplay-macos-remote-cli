@@ -1,5 +1,6 @@
 import Foundation
 import RemoteCore
+import Emulator
 
 public class CommandLineTool {
     let remoteControl = RemoteControl()
@@ -26,6 +27,7 @@ public class CommandLineTool {
         "setVolume ",
         "receiveVolumeNotifications",
         "tuneIn ",
+        "emulator ",
         "help",
         "?",
     ]
@@ -176,6 +178,26 @@ public class CommandLineTool {
                     self.remoteControl.tuneIn(id: opt!, unblock)
                     block()
                 }
+            case "emulator":
+                var port = 8080
+                var name = "EmulatedDevice"
+
+                if arguments.indices.contains(1) {
+                    if let p = Int(arguments[1]) {
+                        port = p > 0 ? p : port
+                    } else {
+                        fputs("  example:  emulator 8080 EmulatedDevice\n", stderr)
+                    }
+                }
+
+                if arguments.indices.contains(2) {
+                    name = arguments[2]
+                }
+
+                print("emulating device \"\(name)\" on port \(port)  (stop with ctrl+c)")
+                let emulator = DeviceEmulator()
+                emulator.run(port: port, name: name)
+
             case "help":
                 fallthrough
             case "?":

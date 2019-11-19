@@ -48,7 +48,7 @@ $
 ## Configuration
 The command line utility is using [Bonjour](https://en.wikipedia.org/wiki/Bonjour_(software)) to discover available speakers on the local network and automatically connects to the first one found.
 
-This default behaviour can be overriden:
+This default behaviour can be changed by setting up defaults:
 ```
 $ beoplay-cli discover
 name: Beoplay M5 i køkkenet
@@ -56,6 +56,12 @@ host: Beoplay-M5-28096178.local.
 port: 8080
 $ defaults write beoplay-cli host Beoplay-M5-28096178.local.
 ```
+
+It can also be changed by using environment variables:
+```
+$ BEOPLAY_HOST=macbook12.local. BEOPLAY_PORT=8080 beoplay-cli getSources
+```
+
 
 ## Credits & Related Projects
 - https://github.com/martonborzak/ha-beoplay

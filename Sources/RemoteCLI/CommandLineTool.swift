@@ -77,17 +77,11 @@ public class CommandLineTool {
             print("port:", service.port)
         }
 
-        func sourcesHandler(sources: [[String]]) {
+        func sourcesHandler(sources: [BeoplaySource]) {
             if sources.isEmpty {
                 fputs("failed to get sources\n", stderr)
             } else {
-                for source in sources {
-                    // let id = source[0]
-                    // let type = source[1]
-                    // let category = source[2]
-                    // let name = source[3]
-                    print(source.joined(separator: ", "))
-                }
+                dump(sources)
             }
             unblock()
         }

@@ -46,18 +46,22 @@ public class RemoteControl {
         self.endpoint.port = port
     }
 
-    public func getSources(_ completion: @escaping ([[String]]) -> ()) {
+    public func getSources(_ completion: @escaping ([BeoplaySource]) -> ()) {
         func completionData(data: Data?) {
-            var sources = [[String]]()
+            var sources = [BeoplaySource]()
 
             if data != nil {
                 if let json = try? JSON(data: data!) {
                     for (_, source) in json["sources"] {
-                        let id = source[0].stringValue
-                        let type = source[1]["sourceType"]["type"].stringValue
-                        let category = source[1]["category"].stringValue
-                        let name = source[1]["friendlyName"].stringValue
-                        sources.append([id, type, category, name])
+                        let source = BeoplaySource(
+                            id: source[0].stringValue,
+                            sourceType: source[1]["sourceType"]["type"].stringValue,
+                            category: source[1]["category"].stringValue,
+                            friendlyName: source[1]["friendlyName"].stringValue,
+                            productBorrowed: source[1]["product"]["borrowed"].boolValue,
+                            productFriendlyName: source[1]["product"]["friendlyName"].stringValue
+                        )
+                        sources.append(source)
                     }
                 }
             }

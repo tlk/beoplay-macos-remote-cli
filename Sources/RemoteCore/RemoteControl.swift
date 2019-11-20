@@ -80,13 +80,17 @@ public class RemoteControl {
         self.remoteAdmin.getEnabledControlledSourceIds { (enabledSourceIds: [String]) -> () in
             self.getSources { (sources: [BeoplaySource]) -> () in
                 var result = [BeoplaySource]()
-
-                for id in enabledSourceIds {
-                    let isBorrowed = id.contains(":")
-                    for source in sources {
-                        let sourceId = isBorrowed ? id : "\(id):\(source.productJid)"
-                        if sourceId == source.id && isBorrowed == source.borrowed {
-                            result.append(source)
+                if enabledSourceIds.isEmpty {
+                    // fallback fx for Beosound Moment
+                    result = sources
+                } else {
+                    for id in enabledSourceIds {
+                        let isBorrowed = id.contains(":")
+                        for source in sources {
+                            let sourceId = isBorrowed ? id : "\(id):\(source.productJid)"
+                            if sourceId == source.id && isBorrowed == source.borrowed {
+                                result.append(source)
+                            }
                         }
                     }
                 }

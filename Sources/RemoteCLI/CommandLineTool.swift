@@ -17,6 +17,7 @@ public class CommandLineTool {
     public let commands = [
         "discover",
         "getSources",
+        "getEnabledSources",
         "setSource ",
         "play",
         "pause",
@@ -119,6 +120,9 @@ public class CommandLineTool {
                 block()
             case "getSources":
                 self.remoteControl.getSources(sourcesHandler)
+                block()
+            case "getEnabledSources":
+                self.remoteControl.getEnabledSources(sourcesHandler)
                 block()
             case "setSource":
                 var opt: String? = nil

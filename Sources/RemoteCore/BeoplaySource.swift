@@ -5,5 +5,6 @@ public struct BeoplaySource {
     public let category: String
     public let friendlyName: String
     public let borrowed: Bool // 🔗
+    public let productJid: String
     public let productFriendlyName: String
 }

@@ -4,6 +4,7 @@ import SwiftyJSON
 public class RemoteControl {
     private var endpoint = URLComponents()
     private var remoteNotificationsSession: RemoteNotificationsSession?
+    private var remoteAdmin = RemoteAdminControl()
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
@@ -41,9 +42,11 @@ public class RemoteControl {
         bonjour.discoverServices()
     }
 
-    public func setEndpoint(host: String, port: Int) {
+    public func setEndpoint(host: String, port: Int, adminPort: Int = 80) {
         self.endpoint.host = host
         self.endpoint.port = port
+
+        self.remoteAdmin.setEndpoint(host: host, port: adminPort)
     }
 
     public func getSources(_ completion: @escaping ([BeoplaySource]) -> ()) {
@@ -59,6 +62,7 @@ public class RemoteControl {
                             category: source[1]["category"].stringValue,
                             friendlyName: source[1]["friendlyName"].stringValue,
                             borrowed: source[1]["borrowed"].boolValue,
+                            productJid: source[1]["product"]["jid"].stringValue,
                             productFriendlyName: source[1]["product"]["friendlyName"].stringValue
                         )
                         sources.append(source)
@@ -70,6 +74,26 @@ public class RemoteControl {
         }
 
         request(method: "GET", path: "/BeoZone/Zone/Sources", completionData: completionData)
+    }
+
+    public func getEnabledSources(_ completion: @escaping ([BeoplaySource]) -> ()) {
+        self.remoteAdmin.getEnabledControlledSourceIds { (enabledSourceIds: [String]) -> () in
+            self.getSources { (sources: [BeoplaySource]) -> () in
+                var result = [BeoplaySource]()
+
+                for id in enabledSourceIds {
+                    let isBorrowed = id.contains(":")
+                    for source in sources {
+                        let sourceId = isBorrowed ? id : "\(id):\(source.productJid)"
+                        if sourceId == source.id {
+                            result.append(source)
+                        }
+                    }
+                }
+
+                completion(result)
+            }
+        }
     }
 
     public func setSource(id: String, _ completion: @escaping () -> () = {}) {

@@ -85,7 +85,7 @@ public class RemoteControl {
                     let isBorrowed = id.contains(":")
                     for source in sources {
                         let sourceId = isBorrowed ? id : "\(id):\(source.productJid)"
-                        if sourceId == source.id {
+                        if sourceId == source.id && isBorrowed == source.borrowed {
                             result.append(source)
                         }
                     }

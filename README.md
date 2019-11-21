@@ -39,8 +39,8 @@ connection state: online
 connection state: disconnecting
 connection state: offline
 $ 
-$ beoplay-cli emulator
-emulating device "EmulatedDevice" on port 8080  (stop with ctrl+c)
+$ beoplay-cli emulator 80 "Funkytown"
+emulating device "Funkytown" on port 80  (stop with ctrl+c)
 ^C
 $
 ```

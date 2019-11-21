@@ -32,12 +32,14 @@ public class DeviceEmulator {
                     "radio:1234.1234567.12345678@products.bang-olufsen.com",
                     [
                         "id": "radio:1234.1234567.12345678@products.bang-olufsen.com",
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
                         "sourceType": ["type": "TUNEIN"],
                         "category": "RADIO",
                         "friendlyName": "TuneIn",
                         "borrowed": false,
                         "product": 
                         [
+                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
                             "friendlyName": self.getName()
                         ]
                     ]
@@ -46,12 +48,30 @@ public class DeviceEmulator {
                     "linein:1234.1234567.12345678@products.bang-olufsen.com",
                     [
                         "id": "linein:1234.1234567.12345678@products.bang-olufsen.com",
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
                         "sourceType": ["type": "LINE IN"],
                         "category": "MUSIC",
                         "friendlyName": "Line-In",
                         "borrowed": false,
                         "product": 
                         [
+                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                            "friendlyName": self.getName()
+                        ]
+                    ]
+                ],
+                [
+                    "bluetooth:1234.1234567.12345678@products.bang-olufsen.com",
+                    [
+                        "id": "bluetooth:1234.1234567.12345678@products.bang-olufsen.com",
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                        "sourceType": ["type": "BLUETOOTH"],
+                        "category": "MUSIC",
+                        "friendlyName": "Bluetooth",
+                        "borrowed": false,
+                        "product":
+                        [
+                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
                             "friendlyName": self.getName()
                         ]
                     ]
@@ -60,26 +80,30 @@ public class DeviceEmulator {
                     "alarm:1234.1234567.12345678@products.bang-olufsen.com",
                     [
                         "id": "alarm:1234.1234567.12345678@products.bang-olufsen.com",
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
                         "sourceType": ["type": "ALARM"],
                         "category": "ALARM",
                         "friendlyName": "Alarm",
                         "borrowed": false,
                         "product": 
                         [
+                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
                             "friendlyName": self.getName()
                         ]
                     ]
                 ],
                 [
-                    "spotify:1234.1234567.12345678@products.bang-olufsen.com",
+                    "spotify:9999.1234567.12345678@products.bang-olufsen.com",
                     [
-                        "id": "spotify:1234.1234567.12345678@products.bang-olufsen.com",
+                        "id": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
+                        "jid": "9999.1234567.12345678@products.bang-olufsen.com",
                         "sourceType": ["type": "SPOTIFY"],
                         "category": "MUSIC",
                         "friendlyName": "Spotify",
                         "borrowed": true,
                         "product": 
                         [
+                            "jid": "9999.1234567.12345678@products.bang-olufsen.com",
                             "friendlyName": "Living Room"
                         ]
                     ]
@@ -122,6 +146,44 @@ public class DeviceEmulator {
                 )
             )
             response.send(result)
+            next()
+        }
+
+        router.get("/api/getData") { request, response, next in
+            let result = [[
+                "controlledSources": [
+                    "controlledSources": [
+                        [
+                            "deviceId": "",
+                            "enabled": false,
+                            "sourceId": "linein",
+                            "enabledExternal": true
+                        ],
+                        [
+                            "deviceId": "",
+                            "enabled": true,
+                            "sourceId": "radio",
+                            "enabledExternal": true
+                        ],
+                        [
+                            "deviceId": "",
+                            "enabled": false,
+                            "sourceId": "bluetooth",
+                            "enabledExternal": true
+                        ],
+                        [
+                            "deviceId": "9999.1234567.12345678@products.bang-olufsen.com",
+                            "enabled": true,
+                            "sourceId": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
+                            "enabledExternal": false
+                        ]
+                    ]
+                ],
+                "type": "controlledSources"
+            ]]
+
+            let json = JSON(result)
+            response.send(json)
             next()
         }
     }

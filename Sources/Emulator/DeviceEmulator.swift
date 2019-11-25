@@ -11,9 +11,13 @@ public class DeviceEmulator {
         public var speaker: VolumeSpeakerLevel
     }
 
-    public struct VolumeNotification: Codable {
+    public struct VolumeNotificationType: Codable {
         public let type = "VOLUME"
         public var data: VolumeSpeaker
+    }
+
+    public struct VolumeNotification: Codable {
+        public var notification: VolumeNotificationType
     }
 
     let router = Router()
@@ -25,6 +29,21 @@ public class DeviceEmulator {
             response.send("<h1>beoplay-cli emulator: \(self.getName())</h1>")
             next()
         }
+
+        func logger(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
+            print("")
+            print("\(request.method): \(request.urlURL)")
+
+            // Do not use request.readString() in this logger as it will empty the stream
+            // and leave nothing but an empty stream for remaining handlers.
+            // See https://github.com/IBM-Swift/Kitura/issues/1233
+
+            next()
+        }
+
+        router.get(handler: logger)
+        router.post(handler: logger)
+        router.put(handler: logger)
 
         router.get("/BeoZone/Zone/Sources") { request, response, next in
             let sources = ["sources": [
@@ -118,8 +137,8 @@ public class DeviceEmulator {
             do {
                 let vol = try request.read(as: VolumeSpeakerLevel.self)
                 self.volumeLevel = vol.level
-                print("set volumeLevel: \(self.volumeLevel)")
-                response.send("got it, thx")
+                print(vol)
+                response.send(vol)
             } catch {
                 print("unexpected error: \(error)")
             }
@@ -127,24 +146,27 @@ public class DeviceEmulator {
         }
 
         router.get("/BeoZone/Zone/Sound/Volume/Speaker/") { request, response, next in
-            print("get volumeLevel: \(self.volumeLevel)")
             let result = VolumeSpeaker(
                 speaker: VolumeSpeakerLevel(
                     level: self.volumeLevel
                 )
             )
+            print(result)
             response.send(result)
             next()
         }
 
         router.get("/BeoNotify/Notifications") { request, response, next in
             let result = VolumeNotification(
-                data: VolumeSpeaker(
-                    speaker: VolumeSpeakerLevel(
-                        level: self.volumeLevel
+                notification: VolumeNotificationType(
+                    data: VolumeSpeaker(
+                        speaker: VolumeSpeakerLevel(
+                            level: self.volumeLevel
+                        )
                     )
                 )
             )
+            print(result)
             response.send(result)
             next()
         }

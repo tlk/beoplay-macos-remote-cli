@@ -57,20 +57,18 @@ public class RemoteControl {
         func completionData(data: Data?) {
             var sources = [BeoplaySource]()
 
-            if data != nil {
-                if let json = try? JSON(data: data!) {
-                    for (_, source) in json["sources"] {
-                        let source = BeoplaySource(
-                            id: source[0].stringValue,
-                            sourceType: source[1]["sourceType"]["type"].stringValue,
-                            category: source[1]["category"].stringValue,
-                            friendlyName: source[1]["friendlyName"].stringValue,
-                            borrowed: source[1]["borrowed"].boolValue,
-                            productJid: source[1]["product"]["jid"].stringValue,
-                            productFriendlyName: source[1]["product"]["friendlyName"].stringValue
-                        )
-                        sources.append(source)
-                    }
+            if data != nil, let json = try? JSON(data: data!) {
+                for (_, source) in json["sources"] {
+                    let source = BeoplaySource(
+                        id: source[0].stringValue,
+                        sourceType: source[1]["sourceType"]["type"].stringValue,
+                        category: source[1]["category"].stringValue,
+                        friendlyName: source[1]["friendlyName"].stringValue,
+                        borrowed: source[1]["borrowed"].boolValue,
+                        productJid: source[1]["product"]["jid"].stringValue,
+                        productFriendlyName: source[1]["product"]["friendlyName"].stringValue
+                    )
+                    sources.append(source)
                 }
             }
 
@@ -136,7 +134,7 @@ public class RemoteControl {
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
         func getVolumeFromJSON(_ data: Data?) -> Int? {
             var volume: Int?
-            if let json = try? JSON(data: data!) {
+            if data != nil, let json = try? JSON(data: data!) {
                 volume = Int(json["speaker"]["level"].stringValue)
             }
             return volume

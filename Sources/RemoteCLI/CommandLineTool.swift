@@ -3,8 +3,10 @@ import RemoteCore
 import Emulator
 
 public class CommandLineTool {
+    let defaultTimeout = 3.0
     let remoteControl = RemoteControl()
     let sema = DispatchSemaphore(value: 0)
+    var hasEndpoint = false
 
     private func block() {
         sema.wait()
@@ -16,6 +18,7 @@ public class CommandLineTool {
 
     public let commands = [
         "discover",
+        "selectDevice ",
         "getSources",
         "getEnabledSources",
         "setSource ",
@@ -33,54 +36,34 @@ public class CommandLineTool {
         "?",
     ]
 
-    public init() {
-        var host: String? = UserDefaults.standard.string(forKey: "host")
-        var port: Int = UserDefaults.standard.integer(forKey: "port")
-        var debug = false
+    public func setEndpoint(host: String, port: Int) {
+        print("connecting to http://\(host):\(port)")
+        remoteControl.setEndpoint(host: host, port: port)
+        hasEndpoint = true
+    }
 
-        func connect(host: String, port: Int) {
-            if debug {
-                print("connecting to http://\(host):\(port)")
+    public func selectDevice(_ name: String) {
+        var found = false
+
+        func handler(device: NetService) {
+            guard found == false else {
+                return
             }
-            self.remoteControl.setEndpoint(host: host, port: port)
+
+            if device.name == name {
+                found = true
+                remoteControl.stopDiscovery()
+                remoteControl.setEndpoint(host: device.hostName!, port: device.port)
+                hasEndpoint = true
+            }
         }
 
-        if let envHost = ProcessInfo.processInfo.environment["BEOPLAY_HOST"] {
-            host = envHost
-            debug = true
-        }
-
-        if let envPort = ProcessInfo.processInfo.environment["BEOPLAY_PORT"] {
-            port = Int(envPort)!
-            debug = true
-        }
-
-        if host != nil {
-            port = port > 0 ? port : 8080
-            connect(host: host!, port: port)
-        } else {
-            // Pick the first speakers found
-            var first = true
-            self.remoteControl.discover({}, callback: { service in 
-                if first {
-                    first = false
-                    connect(host: service.hostName!, port: service.port)
-                    self.unblock()
-                }
-            })
-
-            block()
-        }
+        let delegate = SerializedDeviceLocator(didFind: handler, didStop: unblock)
+        remoteControl.startDiscovery(delegate: delegate, withTimeout: defaultTimeout)
+        block()
     }
 
     public func run(arguments: [String]) {
-
-        func foundSpeakers(_ service: NetService) {
-            print("name:", service.name)
-            print("host:", service.hostName!)
-            print("port:", service.port)
-        }
-
         func sourcesHandler(sources: [BeoplaySource]) {
             if sources.isEmpty {
                 fputs("failed to get sources\n", stderr)
@@ -114,10 +97,33 @@ public class CommandLineTool {
         if (arguments.indices.contains(0)) {
             let cmd = arguments[0]
 
+            guard hasEndpoint || cmd == "discover" || cmd == "selectDevice" else {
+                fputs("failed to connect to device\n", stderr)
+                return
+            }
+
             switch cmd {
             case "discover":
-                self.remoteControl.discover(unblock, callback: foundSpeakers)
-                block()
+                if arguments.indices.contains(1) && arguments[1] == "notimeout" {
+                    self.remoteControl.startDiscovery(delegate: ConsoleDeviceLocator())
+                    _ = readLine()
+                    self.remoteControl.stopDiscovery()                    
+                } else {
+                    self.remoteControl.startDiscovery(delegate: ConsoleDeviceLocator(), withTimeout: defaultTimeout, next: unblock)
+                    block()
+                }
+                
+            case "selectDevice":
+                if arguments.count == 2 && !arguments[1].isEmpty {
+                    selectDevice(arguments[1])
+                    if hasEndpoint {
+                        print("device endpoint successfully located")
+                    } else {
+                        print("failed to locate device")
+                    }
+                } else {
+                    fputs("  example:  selectDevice \"Beoplay M5\"\n", stderr)
+                }
             case "getSources":
                 self.remoteControl.getSources(sourcesHandler)
                 block()

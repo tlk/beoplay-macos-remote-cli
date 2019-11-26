@@ -5,6 +5,7 @@ public class RemoteControl {
     private var endpoint = URLComponents()
     private var remoteNotificationsSession: RemoteNotificationsSession?
     private var remoteAdmin = RemoteAdminControl()
+    private let browser = BeoplayBrowser()
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
@@ -37,9 +38,12 @@ public class RemoteControl {
         task.resume()
     }
 
-    public func discover(_ completion: @escaping () -> () = {}, callback: @escaping (NetService) -> ()) {
-        let bonjour = BonjourBrowser(completion, callback: callback)
-        bonjour.discoverServices()
+    public func startDiscovery(delegate: NetServiceBrowserDelegate, withTimeout: TimeInterval? = nil, next: (() -> ())? = nil) {
+        browser.searchForDevices(delegate: delegate, withTimeout: withTimeout, next: next)
+    }
+
+    public func stopDiscovery() {
+        browser.stop()
     }
 
     public func setEndpoint(host: String, port: Int, adminPort: Int = 80) {

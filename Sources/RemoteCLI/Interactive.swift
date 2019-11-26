@@ -47,7 +47,18 @@ public class Interactive {
                     break
                 }
 
-                let args = input.components(separatedBy: " ")
+                // support no more than two arguments
+                let args: [String] = input
+                    .split(separator: " ", maxSplits: 1)
+                    .map {
+                        // support arguments ala:  selectDevice "Beoplay M5"
+                        let str = $0.trimmingCharacters(in: .whitespaces)
+                        if str.first == "\u{22}" && str.first == str.last  {
+                            return String(str.dropFirst(1).dropLast(1))
+                        } else {
+                            return str
+                        }
+                    }
                 self.tool.run(arguments: args)
                 self.ln.addHistory(input)
 

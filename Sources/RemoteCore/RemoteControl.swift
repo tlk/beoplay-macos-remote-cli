@@ -177,7 +177,7 @@ public class RemoteControl {
         self.remoteNotificationsSession?.stop()
     }
 
-    public func tuneIn(id: String, _ completion: @escaping () -> () = {}) {
+    public func tuneIn(id: String, name: String = "", _ completion: @escaping () -> () = {}) {
         let payload = JSON(
         [
             "playQueueItem": [
@@ -192,7 +192,7 @@ public class RemoteControl {
                             "url": ""
                         ]
                     ],
-                    "name": "",
+                    "name": name,
                     "tuneIn": [
                         "location": "",
                         "stationId": id

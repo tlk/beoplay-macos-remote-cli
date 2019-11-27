@@ -1,0 +1,1 @@
+beoplay-cli selectDevice "Beoplay Emulated Device" | grep "device endpoint successfully located"

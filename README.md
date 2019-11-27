@@ -21,6 +21,10 @@ $
 
 #### Non-interactive mode
 ```
+$ beoplay-cli discover
++ "Beoplay Emulated Device"	http://macbook12.local.:80
+
+$ export BEOPLAY_NAME="Beoplay Emulated Device"
 $ beoplay-cli getVolume
 35
 $ beoplay-cli setVolume 20
@@ -39,25 +43,24 @@ connection state: online
 connection state: disconnecting
 connection state: offline
 $ 
-$ beoplay-cli emulator 80 "Funkytown"
-emulating device "Funkytown" on port 80  (stop with ctrl+c)
+$ beoplay-cli emulator "Beoplay Emulated Device"
+emulating device "Beoplay Emulated Device" on port 80  (stop with ctrl+c)
 ^C
 $
 ```
 
 ## Configuration
-The command line utility is using [Bonjour](https://en.wikipedia.org/wiki/Bonjour_(software)) to discover available speakers on the local network and automatically connects to the first one found.
+Note that `beoplay-cli discover` is used to list Beoplay device names on the local network.
 
-This default behaviour can be changed by setting up defaults:
+A device name must be passed to beoplay-cli for regular operations such as play, pause, etc to work. This is be done vith the selectDevice command in interactive mode and via an environment variable in non-interactive mode.
+
+Device host and port are located automatically via [Bonjour](https://en.wikipedia.org/wiki/Bonjour_(software)).
+
 ```
-$ beoplay-cli discover
-name: Beoplay M5 i køkkenet
-host: Beoplay-M5-28096178.local.
-port: 8080
-$ defaults write beoplay-cli host Beoplay-M5-28096178.local.
+$ BEOPLAY_NAME="Beoplay Emulated Device" beoplay-cli play
 ```
 
-It can also be changed by using environment variables:
+Host and port can be configured via environment variables as an alternative to Bonjour:
 ```
 $ BEOPLAY_HOST=macbook12.local. BEOPLAY_PORT=8080 beoplay-cli getSources
 ```

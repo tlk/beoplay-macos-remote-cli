@@ -47,19 +47,23 @@ public class Interactive {
                     break
                 }
 
-                // support no more than two arguments
-                let args: [String] = input
-                    .split(separator: " ", maxSplits: 1)
-                    .map {
-                        // support arguments ala:  selectDevice "Beoplay M5"
-                        let str = $0.trimmingCharacters(in: .whitespaces)
-                        if str.first == "\u{22}" && str.first == str.last  {
-                            return String(str.dropFirst(1).dropLast(1))
-                        } else {
-                            return str
-                        }
+                // support arguments ala:  selectDevice "Beoplay M5"
+                let parts = input.split(separator: " ", maxSplits: 1)
+                var command: String?
+                var option: String?
+                
+                if parts.count > 0 {
+                    command = String(parts[0])
+                }
+
+                if parts.count > 1 {
+                    option = String(parts[1])
+                    if option?.first == "\u{22}" && option?.last == "\u{22}" {
+                        option = String(option!.dropFirst(1).dropLast(1))
                     }
-                self.tool.run(arguments: args)
+                }
+
+                _ = self.tool.run(command, option)
                 self.ln.addHistory(input)
 
             } catch LinenoiseError.EOF {

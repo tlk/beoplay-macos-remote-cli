@@ -1,0 +1,1 @@
+beoplay-cli discover | grep "Beoplay Emulated Device"

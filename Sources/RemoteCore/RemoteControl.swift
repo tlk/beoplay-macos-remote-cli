@@ -204,4 +204,12 @@ public class RemoteControl {
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/");
         request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion);
     }
+
+    public func join(_ completion: @escaping () -> () = {}) {
+        request(method: "POST", path: "/BeoZone/Zone/Device/OneWayJoin", completion);
+    }
+
+    public func leave(_ completion: @escaping () -> () = {}) {
+        request(method: "DELETE", path: "/BeoZone/Zone/ActiveSources/primaryExperience", completion);
+    }
 }

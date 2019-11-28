@@ -22,6 +22,8 @@ public class CommandLineTool {
         "getSources",
         "getEnabledSources",
         "setSource ",
+        "join",
+        "leave",
         "play",
         "pause",
         "stop",
@@ -141,6 +143,12 @@ public class CommandLineTool {
                 fputs("  example:  setSource spotify:2714.1200304.28096178@products.bang-olufsen.com\n", stderr)
                 return 1
             }
+        case "join":
+            self.remoteControl.join(unblock)
+            block()
+        case "leave":
+            self.remoteControl.leave(unblock)
+            block()
         case "play":
             self.remoteControl.play(unblock)
             block()

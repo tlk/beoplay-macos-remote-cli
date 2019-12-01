@@ -6,6 +6,7 @@ public class RemoteControl {
     private var remoteNotificationsSession: RemoteNotificationsSession?
     private var remoteAdmin = RemoteAdminControl()
     private let browser = BeoplayBrowser()
+    private var _hasEndpoint = false
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
@@ -51,6 +52,12 @@ public class RemoteControl {
         self.endpoint.port = port
 
         self.remoteAdmin.setEndpoint(host: host, port: adminPort)
+
+        self._hasEndpoint = true
+    }
+
+    public func hasEndpoint() -> Bool {
+        return self._hasEndpoint
     }
 
     public func getSources(_ completion: @escaping ([BeoplaySource]) -> ()) {

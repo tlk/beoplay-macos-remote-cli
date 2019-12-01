@@ -6,7 +6,6 @@ public class CommandLineTool {
     let defaultTimeout = 3.0
     let remoteControl = RemoteControl()
     let sema = DispatchSemaphore(value: 0)
-    var hasEndpoint = false
 
     private func block() {
         sema.wait()
@@ -55,7 +54,6 @@ public class CommandLineTool {
     public func setEndpoint(host: String, port: Int) {
         print("device endpoint set to http://\(host):\(port)")
         remoteControl.setEndpoint(host: host, port: port)
-        hasEndpoint = true
     }
 
     public func selectDevice(_ name: String) {
@@ -70,7 +68,6 @@ public class CommandLineTool {
                 found = true
                 remoteControl.setEndpoint(host: device.hostName!, port: device.port)
                 remoteControl.stopDiscovery()
-                hasEndpoint = true
             }
         }
 
@@ -102,7 +99,7 @@ public class CommandLineTool {
     }
 
     public func run(_ command: String?, _ option: String?) -> Int32 {
-        guard hasEndpoint || !endpointIsRequired(command) else {
+        guard self.remoteControl.hasEndpoint() || !endpointIsRequired(command) else {
             fputs("failed to configure device endpoint\n", stderr)
             return 1
         }
@@ -120,7 +117,7 @@ public class CommandLineTool {
         case "selectDevice":
             if option != nil {
                 selectDevice(option!)
-                if hasEndpoint {
+                if self.remoteControl.hasEndpoint() {
                     print("device endpoint successfully located")
                 } else {
                     fputs("failed to locate device\n", stderr)

@@ -149,7 +149,9 @@ public class RemoteControl {
     }
 
     public func setVolume(volume: Int, _ completion: @escaping () -> () = {}) {
-        request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", body: "{\"level\":\(volume)}", completion)
+        var vol = max(0, volume)
+        vol = min(100, vol)
+        request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", body: "{\"level\":\(vol)}", completion)
     }
 
     public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> (), connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState, String?) -> ()) {

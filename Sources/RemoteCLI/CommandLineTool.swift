@@ -31,6 +31,7 @@ public class CommandLineTool {
         "backward",
         "getVolume",
         "setVolume ",
+        "adjustVolume ",
         "receiveVolumeNotifications",
         "tuneIn ",
         "emulator ",
@@ -173,6 +174,14 @@ public class CommandLineTool {
                 block()
             } else {
                 fputs("  example:  setVolume 20\n", stderr)
+                return 1
+            }
+        case "adjustVolume":
+            if let opt = option, let delta = Int(opt) {
+                self.remoteControl.adjustVolume(delta: delta, unblock)
+                block()
+            } else {
+                fputs("  example:  adjustVolume -5\n", stderr)
                 return 1
             }
         case "receiveVolumeNotifications":

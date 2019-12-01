@@ -154,6 +154,15 @@ public class RemoteControl {
         request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Level", body: "{\"level\":\(vol)}", completion)
     }
 
+    public func adjustVolume(delta: Int, _ completion: @escaping () -> () = {}) {
+        self.getVolume { volume in
+            guard let vol = volume else {
+                return
+            }
+            self.setVolume(volume: vol + delta, completion)
+        }
+    }
+
     public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> (), connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState, String?) -> ()) {
         func volumeChunkReader(data: Data) {
             let chunk = String(decoding: data, as: UTF8.self)

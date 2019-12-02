@@ -32,7 +32,7 @@ $ beoplay-cli getVolume
 20
 $ beoplay-cli pause
 $ beoplay-cli play
-$ beoplay-cli receiveVolumeNotifications
+$ beoplay-cli monitor
 connection state: connecting
 connection state: online
 20

@@ -1,5 +1,7 @@
 build:
 	swift build
+test:
+	swift test
 test-integration: build
 	cd Tests/Integration && ./TestRunner.sh
 release:

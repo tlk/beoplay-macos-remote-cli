@@ -36,5 +36,8 @@ let package = Package(
         .target(
             name: "RemoteCore",
             dependencies: ["SwiftyJSON"]),
+        .testTarget(
+            name: "RemoteCoreTests",
+            dependencies: ["RemoteCore"]),
     ]
 )

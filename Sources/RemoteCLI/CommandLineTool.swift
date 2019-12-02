@@ -21,6 +21,7 @@ public class CommandLineTool {
         "getSources",
         "getEnabledSources",
         "setSource ",
+        "tuneIn ",
         "join",
         "leave",
         "play",
@@ -31,8 +32,7 @@ public class CommandLineTool {
         "getVolume",
         "setVolume ",
         "adjustVolume ",
-        "receiveVolumeNotifications",
-        "tuneIn ",
+        "monitor ",
         "emulator ",
         "help",
         "?",
@@ -181,19 +181,48 @@ public class CommandLineTool {
                 fputs("  example:  adjustVolume -5\n", stderr)
                 return 1
             }
-        case "receiveVolumeNotifications":
-            self.remoteControl.receiveVolumeNotifications(volumeUpdate: volumeHandler) { 
-                (state: RemoteNotificationsSession.ConnectionState, message: String?) in 
+        case "monitor":
+            let map = [
+                "connection" : Notification.Name.onConnectionChange,
+                "volume": Notification.Name.onVolumeChange,
+                "progress": Notification.Name.onProgress,
+                "source": Notification.Name.onSourceChange,
+                "radio": Notification.Name.onNowPlayingRadio,
+                "storedmusic": Notification.Name.onNowPlayingStoredMusic
+            ]
 
-                if message == nil {
-                    fputs("connection state: \(state)\n", stderr)
-                } else {
-                    fputs("connection state: \(state): \(message!)\n", stderr)
-                }
+            var notificationNames = [Notification.Name]()
+            if let opts = option?.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: ",") {
+                notificationNames = opts.compactMap { map[String($0)] }
+            } else if option != nil, let opt = map[option!] {
+                notificationNames.append(opt)
+            } else {
+                // default to all
+                notificationNames = Array(map.values)
             }
 
+            if notificationNames.isEmpty {
+                fputs("  example:  monitor connection,volume,progress,source,radio,storedmusic\n", stderr)
+                return 1
+            }
+
+            var observers = [NSObjectProtocol]()
+            for notificationName in notificationNames {
+                let observer = NotificationCenter.default.addObserver(forName: notificationName, object: nil, queue: nil) { (notification: Notification) -> Void in
+                    if let data = notification.userInfo?["data"] {
+                        print("\(data as AnyObject)")
+                    }
+                }
+                observers.append(observer)
+            }
+            self.remoteControl.startNotifications()
+
             _ = readLine()
-            self.remoteControl.stopVolumeNotifications()
+
+            self.remoteControl.stopNotifications()
+            for observer in observers {
+                NotificationCenter.default.removeObserver(observer)
+            }
         case "tuneIn":
             if let _ = option?.range(of: #"^s[0-9]+$"#, options: .regularExpression) {
                 self.remoteControl.tuneIn(id: option!, unblock)
@@ -204,7 +233,6 @@ public class CommandLineTool {
                 fputs("                   s69060   (DR P5)\n", stderr)
                 fputs("                   s45455   (DR P6)\n", stderr)
                 fputs("                   s69056   (DR P7)\n", stderr)
-                fputs("                   s148845  (Radio24syv)\n", stderr)
                 return 1
             }
         case "emulator":

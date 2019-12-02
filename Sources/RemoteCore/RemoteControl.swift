@@ -3,7 +3,7 @@ import SwiftyJSON
 
 public class RemoteControl {
     private var endpoint = URLComponents()
-    private var remoteNotificationsSession: RemoteNotificationsSession?
+    private var notificationSession: NotificationSession?
     private var remoteAdmin = RemoteAdminControl()
     private let browser = BeoplayBrowser()
     private var _hasEndpoint = false
@@ -170,29 +170,16 @@ public class RemoteControl {
         }
     }
 
-    public func receiveVolumeNotifications(volumeUpdate: @escaping (Int) -> (), connectionUpdate: @escaping (RemoteNotificationsSession.ConnectionState, String?) -> ()) {
-        func volumeChunkReader(data: Data) {
-            let chunk = String(decoding: data, as: UTF8.self)
-            let lines = chunk.split { $0.isNewline }
-
-            for line in lines {
-                let json = JSON(parseJSON: String(line))
-                if json["notification"]["type"].stringValue == "VOLUME" {
-                    if let volume = Int(json["notification"]["data"]["speaker"]["level"].stringValue) {
-                        volumeUpdate(volume)
-                    }
-                }
-            }
-        }
-
+    public func startNotifications() {
         var urlComponents = self.endpoint
         urlComponents.path = "/BeoNotify/Notifications"
-        self.remoteNotificationsSession = RemoteNotificationsSession(url: urlComponents.url!, chunkReader: volumeChunkReader, connectionCallback: connectionUpdate)
-        self.remoteNotificationsSession?.start()
+
+        self.notificationSession = NotificationSession(url: urlComponents.url!, processor: NotificationBridge())
+        self.notificationSession?.start()
     }
 
-    public func stopVolumeNotifications() {
-        self.remoteNotificationsSession?.stop()
+    public func stopNotifications() {
+        self.notificationSession?.stop()
     }
 
     public func tuneIn(id: String, name: String = "", _ completion: @escaping () -> () = {}) {

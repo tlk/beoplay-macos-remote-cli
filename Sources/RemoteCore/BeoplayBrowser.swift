@@ -9,6 +9,7 @@ public class BeoplayBrowser {
         if withTimeout != nil {
             self.queue.asyncAfter(deadline: .now() + withTimeout!) {
                 self.browser.stop()
+                next?()
             }
         }
 
@@ -17,7 +18,6 @@ public class BeoplayBrowser {
             self.browser.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
             self.browser.searchForServices(ofType: "_beoremote._tcp.", inDomain: "local.")
             RunLoop.current.run()
-            next?()
         }
     }
 

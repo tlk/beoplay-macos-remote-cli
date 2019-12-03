@@ -35,7 +35,6 @@ public class CommandLineTool {
         "monitor ",
         "emulator ",
         "help",
-        "?",
     ]
 
     public let commandsWithoutEndpoint = [
@@ -244,16 +243,13 @@ public class CommandLineTool {
             print("emulating device \"\(name)\" on port \(port)  (stop with ctrl+c)")
             let emulator = DeviceEmulator()
             emulator.run(port: port, name: name)
-        case "help":
-            fallthrough
-        case "?":
-            fputs("available commands: \(self.commands)", stderr)
-            fallthrough
-        case "":
-            fputs("  example:  beoplay-cli play\n", stderr)
-            return 1
         default:
-            fputs("unknown argument\n", stderr)
+            let pretty = commands.map { cmd in
+                cmd.last == " "
+                    ? "\(cmd)[option]"
+                    : cmd
+            }
+            fputs("  available commands: \(pretty)\n", stderr)
             return 1
         }
 

@@ -9,9 +9,10 @@ echo "=  Running integration tests"
 echo "======================================================"
 
 alias beoplay-cli=../../.build/debug/beoplay-cli
+export BEOPLAY_NAME="IntegrationTestDevice"
 
 for integrationTest in *.test; do
-	(beoplay-cli emulator 2>&1 >/dev/null) &
+	(beoplay-cli emulator "$BEOPLAY_NAME" 2>&1 >/dev/null) &
 
 	output=$(./$integrationTest 2>&1)
 	testResult=$?

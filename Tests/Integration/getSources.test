@@ -1,1 +1,1 @@
-BEOPLAY_NAME="Beoplay Emulated Device" beoplay-cli getSources | grep "radio:1234.1234567.12345678@products.bang-olufsen.com"
+beoplay-cli getSources | grep "radio:1234.1234567.12345678@products.bang-olufsen.com"

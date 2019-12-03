@@ -1,2 +1,2 @@
-BEOPLAY_NAME="Beoplay Emulated Device" beoplay-cli setVolume 42
-BEOPLAY_NAME="Beoplay Emulated Device" beoplay-cli getVolume | grep 42
+beoplay-cli setVolume 42
+beoplay-cli getVolume | grep 42

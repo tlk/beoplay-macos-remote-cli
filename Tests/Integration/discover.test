@@ -1,1 +1,1 @@
-beoplay-cli discover | grep "Beoplay Emulated Device"
+beoplay-cli discover | grep "$BEOPLAY_NAME"

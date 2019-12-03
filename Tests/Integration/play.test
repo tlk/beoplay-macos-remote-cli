@@ -1,1 +1,1 @@
-BEOPLAY_NAME="Beoplay Emulated Device" beoplay-cli play
+beoplay-cli play

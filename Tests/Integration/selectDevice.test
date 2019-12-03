@@ -1,1 +1,3 @@
-beoplay-cli selectDevice "Beoplay Emulated Device" | grep "device endpoint successfully located"
+LOCAL_BEOPLAY_NAME=$BEOPLAY_NAME
+unset BEOPLAY_NAME
+beoplay-cli selectDevice "$LOCAL_BEOPLAY_NAME" | grep "device endpoint successfully located"

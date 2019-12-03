@@ -17,23 +17,23 @@ extension Notification.Name {
     public static let onNowPlayingStoredMusic = Notification.Name("RemoteCore.onNowPlayingStoredMusic")
 }
 
-enum DeviceState : String {
+public enum DeviceState : String {
     case idle, preparing, play, pause, unknown
 }
 
-struct Volume {
+public struct Volume {
     public let volume: Int
     public let muted: Bool
     public let minimum: Int
     public let maximum: Int
 }
 
-struct Progress {
+public struct Progress {
     public let playQueueItemId: String
     public let state: DeviceState
 }
 
-struct Source {
+public struct Source {
     public let id: String
     public let type: String
     public let category: String
@@ -43,13 +43,13 @@ struct Source {
     public let state: DeviceState
 }
 
-struct NowPlayingRadio {
+public struct NowPlayingRadio {
     public let stationId: String
     public let liveDescription: String
     public let name: String
 }
 
-struct NowPlayingStoredMusic {
+public struct NowPlayingStoredMusic {
     public let name: String
     public let artist: String
     public let album: String

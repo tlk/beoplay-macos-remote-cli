@@ -223,15 +223,28 @@ public class CommandLineTool {
                 NotificationCenter.default.removeObserver(observer)
             }
         case "tuneIn":
-            if let _ = option?.range(of: #"^s[0-9]+$"#, options: .regularExpression) {
-                self.remoteControl.tuneIn(id: option!, unblock)
+            func map(_ input: String?) -> (String,String)? {
+                input?.range(of: #"^s[0-9]+$"#, options: .regularExpression) != nil
+                    ? (input!,input!)
+                    : nil
+            }
+            var stations = [(String,String)]()
+            if let matches = option?.contains(","), matches == true {
+                let result = option?.split(separator: ",").compactMap {
+                    id in map(String(id))
+                }
+                if result != nil {
+                    stations = result!
+                }
+            } else if let station = map(option) {
+                stations.append(station)
+            }
+
+            if stations.isEmpty == false {
+                self.remoteControl.tuneIn(stations: stations, unblock)
                 block()
             } else {
-                fputs("  example:  tuneIn s24861   (DR P3)\n", stderr)
-                fputs("                   s37309   (DR P4)\n", stderr)
-                fputs("                   s69060   (DR P5)\n", stderr)
-                fputs("                   s45455   (DR P6)\n", stderr)
-                fputs("                   s69056   (DR P7)\n", stderr)
+                fputs("  example:  tuneIn s24861,s37309,s69060,s45455,s69056\n", stderr)
                 return 1
             }
         case "emulator":

@@ -186,10 +186,9 @@ public class RemoteControl {
         self.notificationSession?.stop()
     }
 
-    public func tuneIn(id: String, name: String = "", _ completion: @escaping () -> () = {}) {
-        let payload = JSON(
-        [
-            "playQueueItem": [
+    public func tuneIn(stations: [(String, String)], _ completion: @escaping () -> () = {}) {
+        let items = stations.map { id, name in
+            [
                 "behaviour": "planned",
                 "id": id,
                 "station": [
@@ -208,7 +207,8 @@ public class RemoteControl {
                     ]
                 ]
             ]
-        ]).rawString()!
+        }
+        let payload = JSON(["playQueueItem": items]).rawString()!
 
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/") {
             self.request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion)

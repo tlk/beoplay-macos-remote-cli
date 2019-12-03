@@ -130,13 +130,13 @@ public class RemoteControl {
         }
     }
 
-    public func forward(_ completion: @escaping () -> () = {}) {
+    public func next(_ completion: @escaping () -> () = {}) {
         request(method: "POST", path: "/BeoZone/Zone/Stream/Forward") {
             self.request(method: "POST", path: "/BeoZone/Zone/Stream/Forward/Release", completion)
         }
     }
 
-    public func backward(_ completion: @escaping () -> () = {}) {
+    public func back(_ completion: @escaping () -> () = {}) {
         request(method: "POST", path: "/BeoZone/Zone/Stream/Backward") {
             self.request(method: "POST", path: "/BeoZone/Zone/Stream/Backward/Release", completion)
         }

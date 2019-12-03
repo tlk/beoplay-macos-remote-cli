@@ -27,8 +27,8 @@ public class CommandLineTool {
         "play",
         "pause",
         "stop",
-        "forward",
-        "backward",
+        "next",
+        "back",
         "getVolume",
         "setVolume ",
         "adjustVolume ",
@@ -155,11 +155,11 @@ public class CommandLineTool {
         case "stop":
             self.remoteControl.stop(unblock)
             block()
-        case "forward":
-            self.remoteControl.forward(unblock)
+        case "next":
+            self.remoteControl.next(unblock)
             block()
-        case "backward":
-            self.remoteControl.backward(unblock)
+        case "back":
+            self.remoteControl.back(unblock)
             block()
         case "getVolume":
             self.remoteControl.getVolume(volumeHandlerUnblock)

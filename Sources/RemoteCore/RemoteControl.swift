@@ -113,6 +113,43 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: "{\"primaryExperience\":{\"source\":{\"id\":\"\(id)\"}}}", completion)
     }
 
+    public func tuneIn(stations: [(String, String)], _ completion: @escaping () -> () = {}) {
+        let items = stations.map { id, name in
+            [
+                "behaviour": "planned",
+                "id": id,
+                "station": [
+                    "id": id,
+                    "image": [
+                        [
+                            "mediatype": "image/jpg",
+                            "size": "medium",
+                            "url": ""
+                        ]
+                    ],
+                    "name": name,
+                    "tuneIn": [
+                        "location": "",
+                        "stationId": id
+                    ]
+                ]
+            ]
+        }
+        let payload = JSON(["playQueueItem": items]).rawString()!
+
+        request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/") {
+            self.request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion)
+        }
+    }
+
+    public func join(_ completion: @escaping () -> () = {}) {
+        request(method: "POST", path: "/BeoZone/Zone/Device/OneWayJoin", completion);
+    }
+
+    public func leave(_ completion: @escaping () -> () = {}) {
+        request(method: "DELETE", path: "/BeoZone/Zone/ActiveSources/primaryExperience", completion);
+    }
+
     public func play(_ completion: @escaping () -> () = {}) {
         request(method: "POST", path: "/BeoZone/Zone/Stream/Play") {
             self.request(method: "POST", path: "/BeoZone/Zone/Stream/Play/Release", completion)
@@ -185,42 +222,5 @@ public class RemoteControl {
 
     public func stopNotifications() {
         self.notificationSession?.stop()
-    }
-
-    public func tuneIn(stations: [(String, String)], _ completion: @escaping () -> () = {}) {
-        let items = stations.map { id, name in
-            [
-                "behaviour": "planned",
-                "id": id,
-                "station": [
-                    "id": id,
-                    "image": [
-                        [
-                            "mediatype": "image/jpg",
-                            "size": "medium",
-                            "url": ""
-                        ]
-                    ],
-                    "name": name,
-                    "tuneIn": [
-                        "location": "",
-                        "stationId": id
-                    ]
-                ]
-            ]
-        }
-        let payload = JSON(["playQueueItem": items]).rawString()!
-
-        request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/") {
-            self.request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion)
-        }
-    }
-
-    public func join(_ completion: @escaping () -> () = {}) {
-        request(method: "POST", path: "/BeoZone/Zone/Device/OneWayJoin", completion);
-    }
-
-    public func leave(_ completion: @escaping () -> () = {}) {
-        request(method: "DELETE", path: "/BeoZone/Zone/ActiveSources/primaryExperience", completion);
     }
 }

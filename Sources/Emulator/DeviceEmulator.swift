@@ -218,7 +218,7 @@ public class DeviceEmulator {
         ns = NetService(domain: "local.", type: "_beoremote._tcp.", name: name, port: Int32(port))
         ns?.publish()
 
-        Kitura.addHTTPServer(onPort: port, with: router)
+        Kitura.addHTTPServer(onPort: 9000, with: router)
         Kitura.run()
     }
 

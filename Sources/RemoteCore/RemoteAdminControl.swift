@@ -7,8 +7,6 @@ public class RemoteAdminControl {
     public init() {
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
-
-        self.endpoint.scheme = "http"
     }
 
     private func request(method: String,
@@ -38,6 +36,12 @@ public class RemoteAdminControl {
     public func setEndpoint(host: String, port: Int) {
         self.endpoint.host = host
         self.endpoint.port = port
+        self.endpoint.scheme = "http"
+    }
+
+    public func clearEndpoint() {
+        self.endpoint.host = nil
+        self.endpoint.port = nil
     }
 
     public func getEnabledControlledSourceIds(_ completion: @escaping ([String]) -> ()) {

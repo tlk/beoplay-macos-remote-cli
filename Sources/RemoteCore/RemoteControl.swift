@@ -6,13 +6,10 @@ public class RemoteControl {
     private var notificationSession: NotificationSession?
     private var remoteAdmin = RemoteAdminControl()
     private let browser = BeoplayBrowser()
-    private var _hasEndpoint = false
 
     public init() {
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
-
-        self.endpoint.scheme = "http"
     }
 
     private func request(method: String, path: String, query: String? = nil, body: String? = nil, _ completion: (() -> ())? = nil) {
@@ -49,14 +46,18 @@ public class RemoteControl {
     public func setEndpoint(host: String, port: Int, adminPort: Int = 80) {
         self.endpoint.host = host
         self.endpoint.port = port
-
+        self.endpoint.scheme = "http"
         self.remoteAdmin.setEndpoint(host: host, port: adminPort)
-
-        self._hasEndpoint = true
     }
 
+    public func clearEndpoint() {
+        self.endpoint.host = nil
+        self.endpoint.port = nil
+        self.remoteAdmin.clearEndpoint()
+	}
+
     public func hasEndpoint() -> Bool {
-        return self._hasEndpoint
+        return self.endpoint.host != nil
     }
 
     public func getSources(_ completion: @escaping ([BeoplaySource]) -> ()) {

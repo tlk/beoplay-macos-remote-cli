@@ -171,6 +171,7 @@ public class DeviceEmulator {
             next()
         }
 
+        // This endpoint normally lives on port 80
         router.get("/api/getData") { request, response, next in
             let result = [[
                 "controlledSources": [
@@ -218,7 +219,11 @@ public class DeviceEmulator {
         ns = NetService(domain: "local.", type: "_beoremote._tcp.", name: name, port: Int32(port))
         ns?.publish()
 
-        Kitura.addHTTPServer(onPort: 9000, with: router)
+        if self.ns?.name == "NonRespondingDevice" {
+            RunLoop.current.run()
+        }
+
+        Kitura.addHTTPServer(onPort: port, with: router)
         Kitura.run()
     }
 

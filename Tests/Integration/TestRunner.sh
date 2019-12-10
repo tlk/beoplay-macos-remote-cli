@@ -8,7 +8,7 @@ echo "======================================================"
 echo "=  Running integration tests" 
 echo "======================================================"
 
-alias beoplay-cli=../../.build/debug/beoplay-cli
+export PATH=$PATH:../../.build/debug/
 export BEOPLAY_NAME="IntegrationTestDevice"
 
 for integrationTest in *.test; do

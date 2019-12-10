@@ -32,6 +32,8 @@ public class CommandLineTool {
         "getVolume",
         "setVolume ",
         "adjustVolume ",
+        "mute",
+        "unmute",
         "monitor ",
         "emulator ",
         "help",
@@ -180,6 +182,12 @@ public class CommandLineTool {
                 fputs("  example:  adjustVolume -5\n", stderr)
                 return 1
             }
+        case "mute":
+            self.remoteControl.mute(unblock)
+            block()
+        case "unmute":
+            self.remoteControl.unmute(unblock)
+            block()
         case "monitor":
             let map = [
                 "connection" : Notification.Name.onConnectionChange,

@@ -8,7 +8,7 @@ echo "======================================================"
 echo "=  Running integration tests" 
 echo "======================================================"
 
-export PATH=$PATH:../../.build/debug/
+export PATH=../../.build/debug/:$PATH
 export BEOPLAY_NAME="IntegrationTestDevice"
 
 for integrationTest in *.test; do

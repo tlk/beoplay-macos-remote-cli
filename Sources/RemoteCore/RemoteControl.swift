@@ -212,6 +212,14 @@ public class RemoteControl {
         }
     }
 
+    public func mute(_ completion: @escaping () -> () = {}) {
+        request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Muted", body: "{\"muted\":true}", completion)
+    }
+
+    public func unmute(_ completion: @escaping () -> () = {}) {
+        request(method: "PUT", path: "/BeoZone/Zone/Sound/Volume/Speaker/Muted", body: "{\"muted\":false}", completion)
+    }
+
     public func startNotifications() {
         var urlComponents = self.endpoint
         urlComponents.path = "/BeoNotify/Notifications"

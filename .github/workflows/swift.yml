@@ -4,10 +4,22 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: macOS-latest
-
     steps:
     - uses: actions/checkout@v1
     - name: Build
       run: swift build -v
+
+  test:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Test
+      run: make test
+
+  test-integration:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Integration
+      run: make test-integration

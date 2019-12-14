@@ -12,3 +12,5 @@ uninstall:
 	rm /usr/local/bin/beoplay-cli
 clean:
 	swift package clean
+flush-dns:
+	sudo killall -HUP mDNSResponder

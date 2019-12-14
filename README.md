@@ -78,5 +78,3 @@ $ beoplay-cli play
 - https://github.com/jstasiak/python-zeroconf
 - https://github.com/andybest/linenoise-swift
 - https://github.com/tlk/beoplay-macos-remote-gui
-
-[![Nice Device](./nicedevice.png)](https://youtu.be/KbWtaxoIQeg)

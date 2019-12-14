@@ -2,6 +2,7 @@ import Foundation
 import RemoteCore
 
 let tool = CommandLineTool()
+tool.enablePiping()
 
 func setupEndpoint() {
     if let name = ProcessInfo.processInfo.environment["BEOPLAY_NAME"]{

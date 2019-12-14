@@ -2,10 +2,23 @@ import Foundation
 import RemoteCore
 import Emulator
 
+#if os(Linux)
+    import Glibc
+#else
+    import Darwin.C
+#endif
+
 public class CommandLineTool {
     let defaultTimeout = 3.0
     let remoteControl = RemoteControl()
     let sema = DispatchSemaphore(value: 0)
+
+    public func enablePiping() {
+        // Disable buffering instead of doing manual flush
+        // https://stackoverflow.com/a/28180452/936466
+        setbuf(__stdoutp, nil);
+        setbuf(__stderrp, nil);
+    }
 
     private func block() {
         sema.wait()

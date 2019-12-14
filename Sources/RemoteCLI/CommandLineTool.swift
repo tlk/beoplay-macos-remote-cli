@@ -262,8 +262,8 @@ public class CommandLineTool {
                 port = p
             }
             print("emulating device \"\(name)\" on port \(port)  (stop with ctrl+c)")
-            let emulator = DeviceEmulator()
-            emulator.run(port: port, name: name)
+            let emulator = DeviceEmulator(port: port)
+            emulator.run(name: name)
         default:
             let pretty = commands.map { cmd in
                 cmd.last == " "

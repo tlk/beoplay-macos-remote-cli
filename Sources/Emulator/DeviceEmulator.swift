@@ -1,234 +1,289 @@
 import Foundation
-import Kitura
-import SwiftyJSON
+import Embassy
+import Ambassador
+import RemoteCore
 
 public class DeviceEmulator {
-    public struct VolumeSpeakerLevel: Codable {
-        public var level: Int
+    let debug = false
+
+    // https://gist.github.com/nestserau/ce8f5e5d3f68781732374f7b1c352a5a
+    private let observerLock = DispatchSemaphore(value: 1)
+    private var observers = [AsyncResponseHandler]()
+    func addObserver(observer: AsyncResponseHandler) {
+        observerLock.wait()
+        defer { observerLock.signal() }
+        observers.append(observer)
     }
 
-    public struct VolumeSpeaker: Codable {
-        public var speaker: VolumeSpeakerLevel
-    }
-
-    public struct VolumeNotificationType: Codable {
-        public let type = "VOLUME"
-        public var data: VolumeSpeaker
-    }
-
-    public struct VolumeNotification: Codable {
-        public var notification: VolumeNotificationType
-    }
-
-    let router = Router()
-    var ns: NetService?
-    var volumeLevel = 10
-
-    public init() {
-        router.get("/") { request, response, next in
-            response.send("<h1>beoplay-cli emulator: \(self.getName())</h1>")
-            next()
+    func removeObserver(observer: AsyncResponseHandler) {
+        observerLock.wait()
+        defer { observerLock.signal() }
+        if let index = observers.firstIndex(of: observer) {
+            observers.remove(at: index)
         }
+    }
 
-        func logger(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
-            print("")
-            print("\(request.method): \(request.urlURL)")
-
-            // Do not use request.readString() in this logger as it will empty the stream
-            // and leave nothing but an empty stream for remaining handlers.
-            // See https://github.com/IBM-Swift/Kitura/issues/1233
-
-            next()
+    func didUpdateVolume() {
+        observerLock.wait()
+        defer { observerLock.signal() }
+        for observer in observers {
+            observer.sendVolume()
         }
+    }
 
-        router.get(handler: logger)
-        router.post(handler: logger)
-        router.put(handler: logger)
-
-        router.get("/BeoZone/Zone/Sources") { request, response, next in
-            let sources = ["sources": [
-                [
-                    "radio:1234.1234567.12345678@products.bang-olufsen.com",
-                    [
-                        "id": "radio:1234.1234567.12345678@products.bang-olufsen.com",
-                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                        "sourceType": ["type": "TUNEIN"],
-                        "category": "RADIO",
-                        "friendlyName": "TuneIn",
-                        "borrowed": false,
-                        "product": 
-                        [
-                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                            "friendlyName": self.getName()
-                        ]
-                    ]
-                ],
-                [
-                    "linein:1234.1234567.12345678@products.bang-olufsen.com",
-                    [
-                        "id": "linein:1234.1234567.12345678@products.bang-olufsen.com",
-                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                        "sourceType": ["type": "LINE IN"],
-                        "category": "MUSIC",
-                        "friendlyName": "Line-In",
-                        "borrowed": false,
-                        "product": 
-                        [
-                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                            "friendlyName": self.getName()
-                        ]
-                    ]
-                ],
-                [
-                    "bluetooth:1234.1234567.12345678@products.bang-olufsen.com",
-                    [
-                        "id": "bluetooth:1234.1234567.12345678@products.bang-olufsen.com",
-                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                        "sourceType": ["type": "BLUETOOTH"],
-                        "category": "MUSIC",
-                        "friendlyName": "Bluetooth",
-                        "borrowed": false,
-                        "product":
-                        [
-                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                            "friendlyName": self.getName()
-                        ]
-                    ]
-                ],
-                [
-                    "alarm:1234.1234567.12345678@products.bang-olufsen.com",
-                    [
-                        "id": "alarm:1234.1234567.12345678@products.bang-olufsen.com",
-                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                        "sourceType": ["type": "ALARM"],
-                        "category": "ALARM",
-                        "friendlyName": "Alarm",
-                        "borrowed": false,
-                        "product": 
-                        [
-                            "jid": "1234.1234567.12345678@products.bang-olufsen.com",
-                            "friendlyName": self.getName()
-                        ]
-                    ]
-                ],
-                [
-                    "spotify:9999.1234567.12345678@products.bang-olufsen.com",
-                    [
-                        "id": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
-                        "jid": "9999.1234567.12345678@products.bang-olufsen.com",
-                        "sourceType": ["type": "SPOTIFY"],
-                        "category": "MUSIC",
-                        "friendlyName": "Spotify",
-                        "borrowed": true,
-                        "product": 
-                        [
-                            "jid": "9999.1234567.12345678@products.bang-olufsen.com",
-                            "friendlyName": "Living Room"
-                        ]
-                    ]
-                ]
-            ]]
-            let json = JSON(sources)
-            response.send(json)
-            next()
+    private let volumeLock = DispatchSemaphore(value: 1)
+    private var _volume = 10
+    public var volume: Int {
+        get {
+            volumeLock.wait()
+            defer { volumeLock.signal() }
+            return _volume
         }
-
-        router.put("/BeoZone/Zone/Sound/Volume/Speaker/Level") { request, response, next in            
-            do {
-                let vol = try request.read(as: VolumeSpeakerLevel.self)
-                self.volumeLevel = vol.level
-                print(vol)
-                response.send(vol)
-            } catch {
-                print("unexpected error: \(error)")
+        set {
+            volumeLock.wait()
+            defer {
+                volumeLock.signal()
+                didUpdateVolume()
             }
-            next()
-        }
-
-        router.get("/BeoZone/Zone/Sound/Volume/Speaker/") { request, response, next in
-            let result = VolumeSpeaker(
-                speaker: VolumeSpeakerLevel(
-                    level: self.volumeLevel
-                )
-            )
-            print(result)
-            response.send(result)
-            next()
-        }
-
-        router.get("/BeoNotify/Notifications") { request, response, next in
-            let result = VolumeNotification(
-                notification: VolumeNotificationType(
-                    data: VolumeSpeaker(
-                        speaker: VolumeSpeakerLevel(
-                            level: self.volumeLevel
-                        )
-                    )
-                )
-            )
-            print(result)
-            response.send(result)
-            next()
-        }
-
-        // This endpoint normally lives on port 80
-        router.get("/api/getData") { request, response, next in
-            let result = [[
-                "controlledSources": [
-                    "controlledSources": [
-                        [
-                            "deviceId": "",
-                            "enabled": false,
-                            "sourceId": "linein",
-                            "enabledExternal": true
-                        ],
-                        [
-                            "deviceId": "",
-                            "enabled": true,
-                            "sourceId": "radio",
-                            "enabledExternal": true
-                        ],
-                        [
-                            "deviceId": "",
-                            "enabled": false,
-                            "sourceId": "bluetooth",
-                            "enabledExternal": true
-                        ],
-                        [
-                            "deviceId": "9999.1234567.12345678@products.bang-olufsen.com",
-                            "enabled": true,
-                            "sourceId": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
-                            "enabledExternal": false
-                        ]
-                    ]
-                ],
-                "type": "controlledSources"
-            ]]
-
-            let json = JSON(result)
-            response.send(json)
-            next()
+            _volume = newValue
         }
     }
 
-    public func getName() -> String {
-        return self.ns?.name ?? "$no-name$"
+    func didUpdateState() {
+        observerLock.wait()
+        defer { observerLock.signal() }
+        for observer in observers {
+            observer.sendProgress()
+        }
     }
 
-    public func run(port: Int, name: String) {
+    private let stateLock = DispatchSemaphore(value: 1)
+    private var _state = RemoteCore.DeviceState.unknown
+    public var state: RemoteCore.DeviceState {
+        get {
+            stateLock.wait()
+            defer { stateLock.signal() }
+            return _state
+        }
+        set {
+            stateLock.wait()
+            defer {
+                stateLock.signal()
+                didUpdateState()
+            }
+            _state = newValue
+        }
+    }
+
+    let volMin = 0
+    let volMax = 90
+    let volMuted = false
+
+    let router = DefaultRouter()
+    var ns: NetService?
+    var server: DefaultHTTPServer?
+    var port: Int
+
+    public init(port: Int) {
+        self.port = port
+    }
+
+    public func run(name: String) {
         ns = NetService(domain: "local.", type: "_beoremote._tcp.", name: name, port: Int32(port))
         ns?.publish()
 
         if self.ns?.name == "NonRespondingDevice" {
             RunLoop.current.run()
+            // never returns
         }
 
-        Kitura.addHTTPServer(onPort: port, with: router)
-        Kitura.run()
+        if let loop = try? SelectorEventLoop(selector: try! KqueueSelector()) {
+            server = DefaultHTTPServer(eventLoop: loop, interface: "localhost", port: port, app: router.app)
+
+            if debug {
+                server?.logger.add(handler: PrintLogHandler())
+            }
+
+            addRoutes()
+            try! server?.start()
+            loop.runForever()
+        }
     }
 
     public func stop() {
-        Kitura.stop()
+        server?.stopAndWait()
         ns?.stop()
+    }
+
+    deinit {
+        stop()
+    }
+}
+
+extension DeviceEmulator {
+    func getName() -> String {
+        return self.ns?.name ?? "$no-name$"
+    }
+
+    func addRoutes() {
+        // Play, original port: 8080
+        router["/BeoZone/Zone/Stream/Play"] = JSONResponse() { environ -> Any in
+            self.state = RemoteCore.DeviceState.play
+            return []
+        }
+
+        // Pause, original port: 8080
+        router["/BeoZone/Zone/Stream/Pause"] = JSONResponse() { environ -> Any in
+            self.state = RemoteCore.DeviceState.pause
+            return []
+        }
+
+        // Stop, original port: 8080
+        router["/BeoZone/Zone/Stream/Stop"] = JSONResponse() { environ -> Any in
+            self.state = RemoteCore.DeviceState.unknown
+            return []
+        }
+
+        // Get volume, original port: 8080
+        router["/BeoZone/Zone/Sound/Volume/Speaker/"] = DelayResponse(JSONResponse(handler: { _ -> Any in
+            return ["speaker": ["level": self.volume]]
+        }))
+
+        // Set volume, original port: 8080
+        router["/BeoZone/Zone/Sound/Volume/Speaker/Level"] = JSONResponse() { (environ, sendJSON) in
+            let input = environ["swsgi.input"] as! SWSGIInput
+
+            guard environ["HTTP_CONTENT_LENGTH"] != nil else {
+                // handle error
+                sendJSON([])
+                return
+            }
+
+            JSONReader.read(input) { json in
+                if let dict = json as? [String: Any], let level = dict["level"] as? Int {
+                    self.volume = level
+                }
+                sendJSON([])
+            }
+        }
+
+        // Notifications, original port: 8080
+        // HTTP Long Polling, see https://en.wikipedia.org/wiki/Push_technology#Long_polling
+        router["/BeoNotify/Notifications"] = AsyncNotificationResponse(emulator: self)
+
+        // Get sources, original port: 8080
+        router["/BeoZone/Zone/Sources"] = DelayResponse(JSONResponse(handler: { _ -> Any in
+            return ["sources": [[
+                "radio:1234.1234567.12345678@products.bang-olufsen.com",
+                [
+                    "id": "radio:1234.1234567.12345678@products.bang-olufsen.com",
+                    "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                    "sourceType": ["type": "TUNEIN"],
+                    "category": "RADIO",
+                    "friendlyName": "TuneIn",
+                    "borrowed": false,
+                    "product": [
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                        "friendlyName": self.getName()
+                    ]
+                ]
+            ],
+            [
+                "linein:1234.1234567.12345678@products.bang-olufsen.com",
+                [
+                    "id": "linein:1234.1234567.12345678@products.bang-olufsen.com",
+                    "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                    "sourceType": ["type": "LINE IN"],
+                    "category": "MUSIC",
+                    "friendlyName": "Line-In",
+                    "borrowed": false,
+                    "product": [
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                        "friendlyName": self.getName()
+                    ]
+                ]
+            ],
+            [
+                "bluetooth:1234.1234567.12345678@products.bang-olufsen.com",
+                [
+                    "id": "bluetooth:1234.1234567.12345678@products.bang-olufsen.com",
+                    "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                    "sourceType": ["type": "BLUETOOTH"],
+                    "category": "MUSIC",
+                    "friendlyName": "Bluetooth",
+                    "borrowed": false,
+                    "product": [
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                        "friendlyName": self.getName()
+                    ]
+                ]
+            ],
+            [
+                "alarm:1234.1234567.12345678@products.bang-olufsen.com",
+                [
+                    "id": "alarm:1234.1234567.12345678@products.bang-olufsen.com",
+                    "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                    "sourceType": ["type": "ALARM"],
+                    "category": "ALARM",
+                    "friendlyName": "Alarm",
+                    "borrowed": false,
+                    "product": [
+                        "jid": "1234.1234567.12345678@products.bang-olufsen.com",
+                        "friendlyName": self.getName()
+                    ]
+                ]
+            ],
+            [
+                "spotify:9999.1234567.12345678@products.bang-olufsen.com",
+                [
+                    "id": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
+                    "jid": "9999.1234567.12345678@products.bang-olufsen.com",
+                    "sourceType": ["type": "SPOTIFY"],
+                    "category": "MUSIC",
+                    "friendlyName": "Spotify",
+                    "borrowed": true,
+                    "product": [
+                        "jid": "9999.1234567.12345678@products.bang-olufsen.com",
+                        "friendlyName": "Living Room"
+                    ]
+                ]
+            ]]]
+        }))
+
+        // Get controlled sources, original port: 80 <-- heads up
+        router["/api/getData"] = DelayResponse(JSONResponse(handler: { _ -> Any in
+            return [["type": "controlledSources", "controlledSources": [
+                "controlledSources": [
+                    [
+                        "deviceId": "",
+                        "enabled": false,
+                        "sourceId": "linein",
+                        "enabledExternal": true
+                    ],
+                    [
+                        "deviceId": "",
+                        "enabled": true,
+                        "sourceId": "radio",
+                        "enabledExternal": true
+                    ],
+                    [
+                        "deviceId": "",
+                        "enabled": false,
+                        "sourceId": "bluetooth",
+                        "enabledExternal": true
+                    ],
+                    [
+                        "deviceId": "9999.1234567.12345678@products.bang-olufsen.com",
+                        "enabled": true,
+                        "sourceId": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
+                        "enabledExternal": false
+                    ]
+                ]
+            ]]]
+        }))
+
+        router["/hello-world"] = DataResponse(statusCode: 200, contentType: "text/html; charset=UTF-8") { environ -> Data in
+            return Data("<h1>beoplay-cli emulator: \(self.getName())</h1>".utf8)
+        }
     }
 }

@@ -1,10 +1,3 @@
-//
-//  NotificationBridge.swift
-//
-//
-//  Created by Thomas L. Kjeldsen on 02/12/2019.
-//
-
 import Foundation
 import SwiftyJSON
 
@@ -80,13 +73,13 @@ public class NotificationBridge : NotificationProcessor {
         return lines.compactMap() { subStr in
             let line = String(subStr)
 
-            let json = JSON(parseJSON: line)
+            let json = JSON(data: Data(line.utf8))
             if json["notification"]["type"].string != nil {
                 lastLine = ""
                 return json
             } else if lastLine.isEmpty == false {
                 let opt = lastLine + line
-                let json = JSON(parseJSON: opt)
+                let json = JSON(data: Data(opt.utf8))
                 if json["notification"]["type"].string != nil {
                     lastLine = ""
                     return json

@@ -48,16 +48,19 @@ public class RemoteAdminControl {
         func completionData(data: Data?) {
             var sourceIds = [String]()
 
-            if data != nil, let json = try? JSON(data: data!) {
-                for (_, source) in json[0]["controlledSources"]["controlledSources"] {
-                    if source["enabled"].boolValue {
-                        let id = source["sourceId"].stringValue
-                        sourceIds.append(id)
-                    }
-                }
+            guard data != nil else {
+                completion(sourceIds)
+                return
             }
 
-           completion(sourceIds)
+            let json = JSON(data: data!)
+            for (_, source) in json[0]["controlledSources"]["controlledSources"] {
+                if source["enabled"].boolValue {
+                    let id = source["sourceId"].stringValue
+                    sourceIds.append(id)
+                }
+            }
+            completion(sourceIds)
         }
 
         request(method: "GET", path: "/api/getData", query: "path=settings:/beo/sources/controlledSources&roles=value", completionData: completionData)

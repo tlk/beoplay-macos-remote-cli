@@ -20,7 +20,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "4.0.0"),
+        .package(url: "https://github.com/IBM-Swift/SwiftyJSON", from: "17.0.5"),
         .package(url: "https://github.com/andybest/linenoise-swift", from: "0.0.3"),
         .package(url: "https://github.com/tlk/Ambassador", from: "4.0.6"),
     ],

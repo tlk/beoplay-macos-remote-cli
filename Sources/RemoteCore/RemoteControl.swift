@@ -64,22 +64,25 @@ public class RemoteControl {
         func completionData(data: Data?) {
             var sources = [BeoplaySource]()
 
-            if data != nil, let json = try? JSON(data: data!) {
-                for (_, source) in json["sources"] {
-                    let source = BeoplaySource(
-                        id: source[0].stringValue,
-                        sourceType: source[1]["sourceType"]["type"].stringValue,
-                        category: source[1]["category"].stringValue,
-                        friendlyName: source[1]["friendlyName"].stringValue,
-                        borrowed: source[1]["borrowed"].boolValue,
-                        productJid: source[1]["product"]["jid"].stringValue,
-                        productFriendlyName: source[1]["product"]["friendlyName"].stringValue
-                    )
-                    sources.append(source)
-                }
+            guard data != nil else {
+                completion(sources)
+                return
             }
 
-           completion(sources)
+            let json = JSON(data: data!)
+            for (_, source) in json["sources"] {
+                let source = BeoplaySource(
+                    id: source[0].stringValue,
+                    sourceType: source[1]["sourceType"]["type"].stringValue,
+                    category: source[1]["category"].stringValue,
+                    friendlyName: source[1]["friendlyName"].stringValue,
+                    borrowed: source[1]["borrowed"].boolValue,
+                    productJid: source[1]["product"]["jid"].stringValue,
+                    productFriendlyName: source[1]["product"]["friendlyName"].stringValue
+                )
+                sources.append(source)
+            }
+            completion(sources)
         }
 
         request(method: "GET", path: "/BeoZone/Zone/Sources", completionData: completionData)
@@ -182,11 +185,12 @@ public class RemoteControl {
 
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
         func getVolumeFromJSON(_ data: Data?) -> Int? {
-            var volume: Int?
-            if data != nil, let json = try? JSON(data: data!) {
-                volume = Int(json["speaker"]["level"].stringValue)
+            guard data != nil else {
+                return nil
             }
-            return volume
+
+            let json = JSON(data: data!)
+            return Int(json["speaker"]["level"].stringValue)
         }
 
         func completionData(data: Data?) {

@@ -34,6 +34,7 @@ public class CommandLineTool {
         "getSources",
         "getEnabledSources",
         "setSource ",
+        "getTuneInFavourites",
         "tuneIn ",
         "join",
         "leave",
@@ -243,6 +244,12 @@ public class CommandLineTool {
             for observer in observers {
                 NotificationCenter.default.removeObserver(observer)
             }
+        case "getTuneInFavourites":
+            self.remoteControl.getTuneInFavourites { (favourites) in
+                dump(favourites)
+                self.unblock()
+            }
+            block()
         case "tuneIn":
             func map(_ input: String?) -> (String,String)? {
                 input?.range(of: #"^s[0-9]+$"#, options: .regularExpression) != nil

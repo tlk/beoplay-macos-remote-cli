@@ -116,6 +116,42 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: "{\"primaryExperience\":{\"source\":{\"id\":\"\(id)\"}}}", completion)
     }
 
+    public func getTuneInFavourites(_ completion: @escaping (_ favourites: [(String, String)]) -> ()) {
+        var favourites = [(String, String)]()
+        request(method: "GET", path: "/BeoDevice/credentials") { creds in
+
+            guard creds != nil else {
+                completion(favourites)
+                return
+            }
+
+            var json = JSON(data: creds!)
+            guard let username = json["profile"]["credential"]["tuneIn"]["account"][0]["username"].string else {
+                // failed to fetch username
+                completion(favourites)
+                return
+            }
+
+            let magic = "aHR0cHM6Ly9vcG1sLnJhZGlvdGltZS5jb20vQnJvd3NlLmFzaHg/Yz1wcmVzZXRzJnBhcnRuZXJJZD1SYWRpb1RpbWUmcmVuZGVyPWpzb24mdXNlcm5hbWU9"
+            let url = String(data: Data(base64Encoded: magic)!, encoding: .utf8)!
+            var request = URLRequest(url: URL(string: url+username)!)
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+            request.httpMethod = "GET"
+            let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                json = JSON(data: data!)
+
+                if json["head"]["status"].stringValue == "200" {
+                    for (_, station) in json["body"] {
+                        favourites.append((station["guide_id"].stringValue, station["text"].stringValue))
+                    }
+                }
+
+                completion(favourites)
+            };
+            task.resume()
+        }
+    }
+
     public func tuneIn(stations: [(String, String)], _ completion: @escaping () -> () = {}) {
         let items = stations.map { id, name in
             [

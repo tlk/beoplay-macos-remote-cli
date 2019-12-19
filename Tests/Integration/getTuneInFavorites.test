@@ -1,0 +1,1 @@
+beoplay-cli getTuneInFavorites | grep DR

@@ -116,39 +116,27 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: "{\"primaryExperience\":{\"source\":{\"id\":\"\(id)\"}}}", completion)
     }
 
-    public func getTuneInFavourites(_ completion: @escaping (_ favourites: [(String, String)]) -> ()) {
-        var favourites = [(String, String)]()
-        request(method: "GET", path: "/BeoDevice/credentials") { creds in
+    public func getTuneInFavorites(_ completion: @escaping (_ favorites: [(String, String)]) -> ()) {
+        var favorites = [(String, String)]()
+        request(method: "GET", path: "/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation") { data in
 
-            guard creds != nil else {
-                completion(favourites)
+            guard data != nil else {
+                completion(favorites)
                 return
             }
 
-            var json = JSON(data: creds!)
-            guard let username = json["profile"]["credential"]["tuneIn"]["account"][0]["username"].string else {
-                // failed to fetch username
-                completion(favourites)
+            let json = JSON(data: data!)
+            guard let list = json["favoriteListStationList"]["favoriteListStation"].array else {
+                completion(favorites)
                 return
             }
 
-            let magic = "aHR0cHM6Ly9vcG1sLnJhZGlvdGltZS5jb20vQnJvd3NlLmFzaHg/Yz1wcmVzZXRzJnBhcnRuZXJJZD1SYWRpb1RpbWUmcmVuZGVyPWpzb24mdXNlcm5hbWU9"
-            let url = String(data: Data(base64Encoded: magic)!, encoding: .utf8)!
-            var request = URLRequest(url: URL(string: url+username)!)
-            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-            request.httpMethod = "GET"
-            let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-                json = JSON(data: data!)
+            for element in list {
+                let station = element["station"]
+                favorites.append((station["tuneIn"]["stationId"].stringValue, station["name"].stringValue))
+            }
 
-                if json["head"]["status"].stringValue == "200" {
-                    for (_, station) in json["body"] {
-                        favourites.append((station["guide_id"].stringValue, station["text"].stringValue))
-                    }
-                }
-
-                completion(favourites)
-            };
-            task.resume()
+            completion(favorites)
         }
     }
 

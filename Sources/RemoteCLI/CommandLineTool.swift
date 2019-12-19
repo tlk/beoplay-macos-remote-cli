@@ -34,7 +34,7 @@ public class CommandLineTool {
         "getSources",
         "getEnabledSources",
         "setSource ",
-        "getTuneInFavourites",
+        "getTuneInFavorites",
         "tuneIn ",
         "join",
         "leave",
@@ -244,9 +244,11 @@ public class CommandLineTool {
             for observer in observers {
                 NotificationCenter.default.removeObserver(observer)
             }
-        case "getTuneInFavourites":
-            self.remoteControl.getTuneInFavourites { (favourites) in
-                dump(favourites)
+        case "getTuneInFavorites":
+            self.remoteControl.getTuneInFavorites { (favorites) in
+                for station in favorites {
+                    print("\(station.0)\t\(station.1)")
+                }
                 self.unblock()
             }
             block()

@@ -282,6 +282,91 @@ extension DeviceEmulator {
             ]]]
         }))
 
+        // Get TuneIn favorite stations, original port: 8080
+        router["/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation"] = DelayResponse(JSONResponse(handler: { _ -> Any in
+            return [
+                "favoriteListStationList": [
+                    "offset": 0,
+                    "count": 3,
+                    "total": 3,
+                    "favoriteListStation": [
+                        [
+                            "id": "id%3df1_0",
+                            "number": 1,
+                            "station": [
+                                "id": "id%3df1_0",
+                                "name": "90.8 | DR P1",
+                                "tuneIn": [
+                                    "stationId": "s24860",
+                                    "location": ""
+                                ],
+                                "image": [
+                                    [
+                                        "url": "http://cdn-profiles.tunein.com/s24860/images/logog.png",
+                                        "size": "large",
+                                        "mediatype": "image/png"
+                                    ]
+                                ]
+                            ],
+                            "_links": [
+                                "self": [
+                                    "href": "./id%3df1_0"
+                                ]
+                            ]
+                        ],
+                        [
+                            "id": "id%3df1_1",
+                            "number": 2,
+                            "station": [
+                                "id": "id%3df1_1",
+                                "name": "DR P2 Klassisk (Classical Music)",
+                                "tuneIn": [
+                                    "stationId": "s37197",
+                                    "location": ""
+                                ],
+                                "image": [
+                                    [
+                                        "url": "http://cdn-profiles.tunein.com/s37197/images/logog.png",
+                                        "size": "large",
+                                        "mediatype": "image/png"
+                                    ]
+                                ]
+                            ],
+                            "_links": [
+                                "self": [
+                                    "href": "./id%3df1_1"
+                                ]
+                            ]
+                        ],
+                        [
+                            "id": "id%3df1_2",
+                            "number": 3,
+                            "station": [
+                                "id": "id%3df1_2",
+                                "name": "93.9 | DR P3 (Euro Hits)",
+                                "tuneIn": [
+                                    "stationId": "s24861",
+                                    "location": ""
+                                ],
+                                "image": [
+                                    [
+                                        "url": "http://cdn-profiles.tunein.com/s24861/images/logog.png",
+                                        "size": "large",
+                                        "mediatype": "image/png"
+                                    ]
+                                ]
+                            ],
+                            "_links": [
+                                "self": [
+                                    "href": "./id%3df1_2"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        }))
+
         router["/hello-world"] = DataResponse(statusCode: 200, contentType: "text/html; charset=UTF-8") { environ -> Data in
             return Data("<h1>beoplay-cli emulator: \(self.getName())</h1>".utf8)
         }

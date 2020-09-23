@@ -48,13 +48,13 @@ public class RemoteAdminControl {
         func completionData(data: Data?) {
             var sourceIds = [String]()
 
-            guard data != nil else {
+            guard data != nil && data!.count > 0 else {
                 completion(sourceIds)
                 return
             }
 
             let json = JSON(data: data!)
-            for (_, source) in json[0]["controlledSources"]["controlledSources"] {
+            for (_, source):(String, JSON) in json[0]["controlledSources"]["controlledSources"] {
                 if source["enabled"].boolValue {
                     let id = source["sourceId"].stringValue
                     sourceIds.append(id)

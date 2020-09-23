@@ -64,14 +64,14 @@ public class RemoteControl {
         func completionData(data: Data?) {
             var sources = [BeoplaySource]()
 
-            guard data != nil else {
+            guard data != nil && data!.count > 0 else {
                 completion(sources)
                 return
             }
 
             let json = JSON(data: data!)
-            for (_, source) in json["sources"] {
-                let source = BeoplaySource(
+            for (_, source):(String, JSON) in json["sources"] {
+                let s = BeoplaySource(
                     id: source[0].stringValue,
                     sourceType: source[1]["sourceType"]["type"].stringValue,
                     category: source[1]["category"].stringValue,
@@ -80,7 +80,7 @@ public class RemoteControl {
                     productJid: source[1]["product"]["jid"].stringValue,
                     productFriendlyName: source[1]["product"]["friendlyName"].stringValue
                 )
-                sources.append(source)
+                sources.append(s)
             }
             completion(sources)
         }
@@ -120,7 +120,7 @@ public class RemoteControl {
         var favorites = [(String, String)]()
         request(method: "GET", path: "/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation") { data in
 
-            guard data != nil else {
+            guard data != nil && data!.count > 0 else {
                 completion(favorites)
                 return
             }
@@ -135,7 +135,6 @@ public class RemoteControl {
                 let station = element["station"]
                 favorites.append((station["tuneIn"]["stationId"].stringValue, station["name"].stringValue))
             }
-
             completion(favorites)
         }
     }
@@ -209,7 +208,7 @@ public class RemoteControl {
 
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
         func getVolumeFromJSON(_ data: Data?) -> Int? {
-            guard data != nil else {
+            guard data != nil && data!.count > 0 else {
                 return nil
             }
 

@@ -221,11 +221,11 @@ public class RemoteControl {
 
             let json = JSON(data: jsonData)
 
-            guard let volume = json["speaker"]["level"].string else {
+            guard let volume = json["speaker"]["level"].int else {
                 return nil
             }
 
-            return Int(volume)
+            return volume
         }
 
         func completionData(data: Data?) {

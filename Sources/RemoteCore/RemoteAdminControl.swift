@@ -9,13 +9,7 @@ public class RemoteAdminControl {
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
     }
 
-    private func request(method: String,
-            path: String,
-            query: String? = nil,
-            body: String? = nil, 
-            completionData: ((Data?) -> ())? = nil, 
-            _ completion: (() -> ())? = nil) {
-
+    private func request(method: String, path: String, query: String? = nil, body: String? = nil, completionData: ((Data?) -> ())? = nil) {
         var urlComponents = self.endpoint
         urlComponents.path = path
         urlComponents.query = query
@@ -27,7 +21,6 @@ public class RemoteAdminControl {
 
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             completionData?(data)
-            completion?()
         };
 
         task.resume()
@@ -48,15 +41,20 @@ public class RemoteAdminControl {
         func completionData(data: Data?) {
             var sourceIds = [String]()
 
-            guard data != nil && data!.count > 0 else {
+            guard let jsonData = data, jsonData.count > 0 else {
                 completion(sourceIds)
                 return
             }
 
-            let json = JSON(data: data!)
-            for (_, source):(String, JSON) in json[0]["controlledSources"]["controlledSources"] {
-                if source["enabled"].boolValue {
-                    let id = source["sourceId"].stringValue
+            let json = JSON(data: jsonData)
+
+            guard let list = json[0]["controlledSources"]["controlledSources"].array else {
+                completion(sourceIds)
+                return
+            }
+
+            for source in list {
+                if source["enabled"].boolValue, let id = source["sourceId"].string {
                     sourceIds.append(id)
                 }
             }

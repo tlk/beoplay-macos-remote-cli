@@ -125,7 +125,7 @@ extension DeviceEmulator {
         return self.ns?.name ?? "$no-name$"
     }
 
-    func addRoutes() {
+    func addRoutes(getDataApiEnabled : Bool = true) {
         // Play, original port: 8080
         router["/BeoZone/Zone/Stream/Play"] = JSONResponse() { environ -> Any in
             self.state = RemoteCore.DeviceState.play
@@ -251,36 +251,44 @@ extension DeviceEmulator {
         }))
 
         // Get controlled sources, original port: 80 <-- heads up
-        router["/api/getData"] = DelayResponse(JSONResponse(handler: { _ -> Any in
-            return [["type": "controlledSources", "controlledSources": [
-                "controlledSources": [
-                    [
-                        "deviceId": "",
-                        "enabled": false,
-                        "sourceId": "linein",
-                        "enabledExternal": true
-                    ],
-                    [
-                        "deviceId": "",
-                        "enabled": true,
-                        "sourceId": "radio",
-                        "enabledExternal": true
-                    ],
-                    [
-                        "deviceId": "",
-                        "enabled": false,
-                        "sourceId": "bluetooth",
-                        "enabledExternal": true
-                    ],
-                    [
-                        "deviceId": "9999.1234567.12345678@products.bang-olufsen.com",
-                        "enabled": true,
-                        "sourceId": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
-                        "enabledExternal": false
+        if (getDataApiEnabled) {
+            router["/api/getData"] = DelayResponse(JSONResponse(handler: { _ -> Any in
+                return [["type": "controlledSources", "controlledSources": [
+                    "controlledSources": [
+                        [
+                            "deviceId": "",
+                            "enabled": false,
+                            "sourceId": "linein",
+                            "enabledExternal": true
+                        ],
+                        [
+                            "deviceId": "",
+                            "enabled": true,
+                            "sourceId": "radio",
+                            "enabledExternal": true
+                        ],
+                        [
+                            "deviceId": "",
+                            "enabled": false,
+                            "sourceId": "bluetooth",
+                            "enabledExternal": true
+                        ],
+                        [
+                            "deviceId": "9999.1234567.12345678@products.bang-olufsen.com",
+                            "enabled": true,
+                            "sourceId": "spotify:9999.1234567.12345678@products.bang-olufsen.com",
+                            "enabledExternal": false
+                        ]
                     ]
-                ]
-            ]]]
-        }))
+                ]]]
+            }))
+
+        } else {
+
+            router["/api/getData"] = DataResponse(statusCode: 500, contentType: "application/json; charset=UTF-8") { environ -> Data in
+                return Data("{\"error\":{\"message\":\"Error: path not whitelisted!\",\"name\":\"error\"}}".utf8)
+            }
+        }
 
         // Get TuneIn favorite stations, original port: 8080
         router["/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation"] = DelayResponse(JSONResponse(handler: { _ -> Any in

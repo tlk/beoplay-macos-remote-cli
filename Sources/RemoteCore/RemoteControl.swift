@@ -64,23 +64,29 @@ public class RemoteControl {
         func completionData(data: Data?) {
             var sources = [BeoplaySource]()
 
-            guard data != nil && data!.count > 0 else {
+            guard let jsonData = data, jsonData.count > 0 else {
                 completion(sources)
                 return
             }
 
-            let json = JSON(data: data!)
-            for (_, source):(String, JSON) in json["sources"] {
-                let s = BeoplaySource(
-                    id: source[0].stringValue,
-                    sourceType: source[1]["sourceType"]["type"].stringValue,
-                    category: source[1]["category"].stringValue,
-                    friendlyName: source[1]["friendlyName"].stringValue,
-                    borrowed: source[1]["borrowed"].boolValue,
-                    productJid: source[1]["product"]["jid"].stringValue,
-                    productFriendlyName: source[1]["product"]["friendlyName"].stringValue
+            let json = JSON(data: jsonData)
+
+            guard let list = json["sources"].array else {
+                completion(sources)
+                return
+            }
+
+            for element in list {
+                let source = BeoplaySource(
+                    id: element[0].stringValue,
+                    sourceType: element[1]["sourceType"]["type"].stringValue,
+                    category: element[1]["category"].stringValue,
+                    friendlyName: element[1]["friendlyName"].stringValue,
+                    borrowed: element[1]["borrowed"].boolValue,
+                    productJid: element[1]["product"]["jid"].stringValue,
+                    productFriendlyName: element[1]["product"]["friendlyName"].stringValue
                 )
-                sources.append(s)
+                sources.append(source)
             }
             completion(sources)
         }
@@ -120,12 +126,13 @@ public class RemoteControl {
         var favorites = [(String, String)]()
         request(method: "GET", path: "/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation") { data in
 
-            guard data != nil && data!.count > 0 else {
+            guard let jsonData = data, jsonData.count > 0 else {
                 completion(favorites)
                 return
             }
 
-            let json = JSON(data: data!)
+            let json = JSON(data: jsonData)
+
             guard let list = json["favoriteListStationList"]["favoriteListStation"].array else {
                 completion(favorites)
                 return
@@ -208,12 +215,17 @@ public class RemoteControl {
 
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
         func getVolumeFromJSON(_ data: Data?) -> Int? {
-            guard data != nil && data!.count > 0 else {
+            guard let jsonData = data, jsonData.count > 0 else {
                 return nil
             }
 
-            let json = JSON(data: data!)
-            return Int(json["speaker"]["level"].stringValue)
+            let json = JSON(data: jsonData)
+
+            guard let volume = json["speaker"]["level"].string else {
+                return nil
+            }
+
+            return Int(volume)
         }
 
         func completionData(data: Data?) {

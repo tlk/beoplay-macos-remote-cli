@@ -33,16 +33,25 @@ $ beoplay-cli getVolume
 $ beoplay-cli pause
 $ beoplay-cli play
 $ beoplay-cli monitor
-connection state: connecting
-connection state: online
-20
-25
-28
-30
+RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.connecting, message: nil)
+RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.online, message: nil)
+RemoteCore.Source(id: "radio:2714.1200304.28096178@products.bang-olufsen.com", type: "TUNEIN", category: "RADIO", friendlyName: "TuneIn", productJid: "2714.1200304.28096178@products.bang-olufsen.com", productFriendlyName: "Beoplay M5 i køkkenet", state: RemoteCore.DeviceState.play)
+RemoteCore.NowPlayingRadio(stationId: "s37309", liveDescription: "Higher Love - Kygo & Whitney Houston", name: "96.5 | DR P4 København (Euro Hits)")
+RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
+RemoteCore.Volume(volume: 35, muted: false, minimum: 0, maximum: 90)
+RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
+RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
+RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
 
-connection state: disconnecting
-connection state: offline
-$ 
+RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.disconnecting, message: nil)
+RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.offline, message: nil)
+$
+$ beoplay-cli monitor volume
+RemoteCore.Volume(volume: 23, muted: false, minimum: 0, maximum: 90)
+RemoteCore.Volume(volume: 27, muted: false, minimum: 0, maximum: 90)
+RemoteCore.Volume(volume: 31, muted: false, minimum: 0, maximum: 90)
+RemoteCore.Volume(volume: 35, muted: false, minimum: 0, maximum: 90)
+
 $ beoplay-cli emulator "Nice Device"
 emulating device "Nice Device" on port 80  (stop with ctrl+c)
 ^C

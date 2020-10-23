@@ -1,8 +1,15 @@
 # beoplay-cli
 
-This is an unofficial Command Line Interface for macOS to remote control network enabled Beoplay loudspeakers.
+This is an unofficial command line interface (CLI) for macOS to remote control network enabled Beoplay loudspeakers.
 
-The CLI is built on top of the [RemoteCore](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCore) library which is also used by the [Beoplay Remote](https://github.com/tlk/beoplay-macos-remote-gui) menu bar app for macOS.
+This repository contains:
+- [Emulator](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/Emulator): device emulator that announces itself on the network (zeroconf/bonjour) and supports volume adjustments
+- [RemoteCore](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCore): device discovery (zeroconf/bonjour), notification module (event based, auto reconnect)
+- [RemoteCLI](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCLI): command line interface
+
+The CLI is built on top of the RemoteCore library.
+
+The RemoteCore library is also used by https://github.com/tlk/beoplay-macos-remote-gui which support keyboard shortcuts on macOS.
 
 ## Installation
 
@@ -81,9 +88,8 @@ $ beoplay-cli play
 ```
 
 
-## Credits & Related Projects
-- https://github.com/martonborzak/ha-beoplay
-- https://github.com/postlund/pyatv
-- https://github.com/jstasiak/python-zeroconf
-- https://github.com/andybest/linenoise-swift
-- https://github.com/tlk/beoplay-macos-remote-gui
+## Related Projects
+- macOS menu bar, keyboard shortcuts and auto discovery: https://github.com/tlk/beoplay-macos-remote-gui
+- Home Assistant plugin: https://github.com/martonborzak/beoplay-custom-component
+- Homebridge plugin: https://github.com/connectjunkie/homebridge-beoplay
+- Python web server with auto discovery: https://github.com/mtlhd/beowebmote

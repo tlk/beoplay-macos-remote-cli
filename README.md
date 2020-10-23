@@ -9,7 +9,7 @@ This repository contains:
 
 The CLI is built on top of the RemoteCore library.
 
-The RemoteCore library is also used by https://github.com/tlk/beoplay-macos-remote-gui which support keyboard shortcuts on macOS.
+The RemoteCore library is also used by https://github.com/tlk/beoplay-macos-remote-gui which supports keyboard shortcuts.
 
 ## Installation
 

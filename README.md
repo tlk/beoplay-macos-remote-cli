@@ -3,7 +3,7 @@
 This is an unofficial command line interface (CLI) for macOS to remote control network enabled Beoplay loudspeakers.
 
 This repository contains:
-- [Emulator](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/Emulator): device emulator that announces itself on the network (zeroconf/bonjour) and supports volume adjustments
+- [Device Emulator](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/Emulator): announces itself on the network (zeroconf/bonjour) and supports volume adjustments
 - [RemoteCore](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCore): device discovery (zeroconf/bonjour), notification module (event based, auto reconnect)
 - [RemoteCLI](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCLI): command line interface
 

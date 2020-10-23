@@ -5,9 +5,7 @@ This is an unofficial command line interface (CLI) for macOS to remote control n
 This repository contains:
 - [Device Emulator](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/Emulator): announces itself on the network (zeroconf/bonjour) and supports volume adjustments
 - [RemoteCore](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCore): device discovery (zeroconf/bonjour), notification module (event based, auto reconnect)
-- [RemoteCLI](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCLI): command line interface
-
-The CLI is built on top of the RemoteCore library.
+- [RemoteCLI](https://github.com/tlk/beoplay-macos-remote-cli/tree/master/Sources/RemoteCLI): command line interface, using the RemoteCore library.
 
 The RemoteCore library is also used by https://github.com/tlk/beoplay-macos-remote-gui which supports keyboard shortcuts.
 

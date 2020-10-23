@@ -11,15 +11,6 @@ The CLI is built on top of the RemoteCore library.
 
 The RemoteCore library is also used by https://github.com/tlk/beoplay-macos-remote-gui which supports keyboard shortcuts.
 
-## Installation
-
-```
-$ make install
-swift build -c release
-[5/5] Linking ./.build/x86_64-apple-macosx/release/beoplay-cli
-cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
-$ 
-```
 
 ## Usage
 
@@ -64,6 +55,18 @@ emulating device "Nice Device" on port 80  (stop with ctrl+c)
 ^C
 $
 ```
+
+
+## Installation
+
+```
+$ make install
+swift build -c release
+[5/5] Linking ./.build/x86_64-apple-macosx/release/beoplay-cli
+cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
+$ 
+```
+
 
 ## Configuration
 

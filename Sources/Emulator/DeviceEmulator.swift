@@ -6,72 +6,54 @@ import RemoteCore
 public class DeviceEmulator {
     let debug = false
 
-    // https://gist.github.com/nestserau/ce8f5e5d3f68781732374f7b1c352a5a
-    private let observerLock = DispatchSemaphore(value: 1)
-    private var observers = [AsyncResponseHandler]()
+    private let _queue = DispatchQueue(label: "device-emulator")
+    private var _observers = [AsyncResponseHandler]()
+    private var _volume = 10
+    private var _state = RemoteCore.DeviceState.unknown
+
     func addObserver(observer: AsyncResponseHandler) {
-        observerLock.wait()
-        defer { observerLock.signal() }
-        observers.append(observer)
+        _queue.sync {
+            NSLog("addObserver")
+            _observers.append(observer)
+        }
     }
 
     func removeObserver(observer: AsyncResponseHandler) {
-        observerLock.wait()
-        defer { observerLock.signal() }
-        if let index = observers.firstIndex(of: observer) {
-            observers.remove(at: index)
+        _queue.sync {
+            NSLog("removeObserver")
+            if let index = _observers.firstIndex(of: observer) {
+                _observers.remove(at: index)
+            }
         }
     }
 
-    func didUpdateVolume() {
-        observerLock.wait()
-        defer { observerLock.signal() }
-        for observer in observers {
-            observer.sendVolume()
-        }
-    }
-
-    private let volumeLock = DispatchSemaphore(value: 1)
-    private var _volume = 10
     public var volume: Int {
         get {
-            volumeLock.wait()
-            defer { volumeLock.signal() }
-            return _volume
+            return _queue.sync { return _volume }
         }
         set {
-            volumeLock.wait()
-            defer {
-                volumeLock.signal()
-                didUpdateVolume()
+            _queue.sync {
+                NSLog("setVolume: \(newValue)")
+                _volume = newValue
+                for observer in _observers {
+                    observer.sendVolume(volume: _volume)
+                }
             }
-            _volume = newValue
         }
     }
 
-    func didUpdateState() {
-        observerLock.wait()
-        defer { observerLock.signal() }
-        for observer in observers {
-            observer.sendProgress()
-        }
-    }
-
-    private let stateLock = DispatchSemaphore(value: 1)
-    private var _state = RemoteCore.DeviceState.unknown
     public var state: RemoteCore.DeviceState {
         get {
-            stateLock.wait()
-            defer { stateLock.signal() }
-            return _state
+            return _queue.sync { return _state }
         }
         set {
-            stateLock.wait()
-            defer {
-                stateLock.signal()
-                didUpdateState()
+            _queue.sync {
+                NSLog("setState: \(newValue)")
+                _state = newValue
+                for observer in _observers {
+                    observer.sendProgress(state: _state.rawValue)
+                }
             }
-            _state = newValue
         }
     }
 

@@ -73,13 +73,17 @@ public class AsyncResponseHandler : NSObject {
     }
 
     func sendProgress() {
+        sendProgress(state: app.emulator.state.rawValue)
+    }
+
+    func sendProgress(state: String) {
         let obj = ["notification": [
             "type": "PROGRESS_INFORMATION",
             "id": app.incrementAndGetCounter(),
             "timestamp": getIso8601Timestamp(),
             "kind": "playing",
             "data": [
-                "state": app.emulator.state.rawValue,
+                "state": state,
                 "position": incrementAndGetCounter(),
                 "totalDuration": limit,
                 "seekSupported": false,
@@ -94,6 +98,10 @@ public class AsyncResponseHandler : NSObject {
     }
 
     func sendVolume() {
+        sendVolume(volume: app.emulator.volume)
+    }
+
+    func sendVolume(volume: Int) {
         let obj = ["notification": [
             "type": "VOLUME",
             "id": app.incrementAndGetCounter(),
@@ -101,7 +109,7 @@ public class AsyncResponseHandler : NSObject {
             "kind": "renderer",
             "data": [
                 "speaker": [
-                    "level": app.emulator.volume,
+                    "level": volume,
                     "muted": app.emulator.volMuted,
                     "range": [
                         "minimum": app.emulator.volMin,

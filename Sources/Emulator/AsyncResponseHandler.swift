@@ -60,9 +60,8 @@ public class AsyncResponseHandler : NSObject {
     func progressLoop() {
         sendProgress()
 
-        // Terminate after limit seconds
         guard getCounter() <= limit else {
-            app.emulator.removeObserver(observer: self)
+            NSLog("disconnect observer after \(limit) seconds")
             sendBody(Data())
             return
         }

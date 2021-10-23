@@ -65,6 +65,12 @@ cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
 $ 
 ```
 
+Alternatively, using Homebrew:
+
+```
+$ brew install tlk/beoplayremote/beoplay-cli
+```
+
 
 ## Configuration
 

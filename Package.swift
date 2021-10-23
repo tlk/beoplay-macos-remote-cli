@@ -21,7 +21,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/IBM-Swift/SwiftyJSON", from: "17.0.5"),
-        .package(url: "https://github.com/andybest/linenoise-swift", from: "0.0.3"),
+        .package(url: "https://github.com/tlk/linenoise-swift", from: "0.0.4"),
         .package(url: "https://github.com/Envoy/Ambassador", from: "4.0.5"),
     ],
     targets: [

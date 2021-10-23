@@ -21,11 +21,11 @@
       },
       {
         "package": "LineNoise",
-        "repositoryURL": "https://github.com/andybest/linenoise-swift",
+        "repositoryURL": "https://github.com/tlk/linenoise-swift",
         "state": {
           "branch": null,
-          "revision": "afc897c02b030af7333105c4fedcd843a8339238",
-          "version": "0.0.3"
+          "revision": "cbf0a35c6e159e4fe6a03f76c8a17ef08e907b0e",
+          "version": "0.0.4"
         }
       },
       {

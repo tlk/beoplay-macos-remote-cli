@@ -62,13 +62,12 @@ $ make install
 swift build -c release
 [5/5] Linking ./.build/x86_64-apple-macosx/release/beoplay-cli
 cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
-$ 
 ```
 
-Alternatively, using Homebrew:
+Alternatively, install with Homebrew:
 
 ```
-$ brew install tlk/beoplayremote/beoplay-cli
+brew install tlk/beoplayremote/beoplay-cli
 ```
 
 
@@ -83,15 +82,15 @@ Beoplay devices on the local network can be discovered in different ways:
 
 The device name can be specified via an environment variable:
 ```
-$ export BEOPLAY_NAME="Beoplay Device"
-$ beoplay-cli play
+export BEOPLAY_NAME="Beoplay Device"
+beoplay-cli play
 ```
 
 Alternatively, host and port can be used:
 ```
-$ export BEOPLAY_HOST=BeoplayDevice.local.
-$ export BEOPLAY_PORT=8080
-$ beoplay-cli play
+export BEOPLAY_HOST=BeoplayDevice.local.
+export BEOPLAY_PORT=8080
+beoplay-cli play
 ```
 
 

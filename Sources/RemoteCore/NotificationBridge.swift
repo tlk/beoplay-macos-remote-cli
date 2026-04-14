@@ -1,5 +1,4 @@
 import Foundation
-import SwiftyJSON
 
 extension Notification.Name {
     public static let onConnectionChange = Notification.Name("RemoteCore.onConnectionChange")
@@ -58,29 +57,27 @@ public class NotificationBridge : NotificationProcessor {
     public init() {}
 
     public func process(_ data: Data) {
-        if let lines = preProcess(data) {
-            self.bridge(lines)
+        if let jsonObjects = parseJsonObjects(data) {
+            self.bridge(jsonObjects)
         }
     }
 
     // Data consists of json objects separated with line breaks.
     // Some objects are broken into multiple lines, so let's handle that.
     private var lastLine = ""
-    private func preProcess(_ data: Data) -> [JSON]? {
+    private func parseJsonObjects(_ data: Data) -> [JSON]? {
         let chunk = String(decoding: data, as: UTF8.self)
         let lines = chunk.split { $0.isNewline }
 
         return lines.compactMap() { subStr in
             let line = String(subStr)
 
-            let json = JSON(data: Data(line.utf8))
-            if json["notification"]["type"].string != nil {
+            if let json = parseJsonObject(from: line) {
                 lastLine = ""
                 return json
             } else if lastLine.isEmpty == false {
-                let opt = lastLine + line
-                let json = JSON(data: Data(opt.utf8))
-                if json["notification"]["type"].string != nil {
+                let candidate = lastLine + line
+                if let json = parseJsonObject(from: candidate) {
                     lastLine = ""
                     return json
                 }
@@ -91,49 +88,72 @@ public class NotificationBridge : NotificationProcessor {
         }
     }
 
+    private func parseJsonObject(from input: String) -> JSON? {
+        guard let json = JSON.from(input: input),
+              json.getString(at: ["notification", "type"]) != nil else {
+            return nil
+        }
+
+        return json
+    }
+
     private func bridge(_ notifications: [JSON]) {
         for json in notifications {
+            let type = json.getString(at: ["notification", "type"])
 
-            if json["notification"]["type"].stringValue == "VOLUME" {
-                let volume = json["notification"]["data"]["speaker"]["level"].intValue
-                let muted = json["notification"]["data"]["speaker"]["muted"].boolValue
-                let minimum = json["notification"]["data"]["speaker"]["range"]["minimum"].intValue
-                let maximum = json["notification"]["data"]["speaker"]["range"]["maximum"].intValue
-                let data = Volume(volume: volume, muted: muted, minimum: minimum, maximum: maximum)
-                NotificationCenter.default.post(name: .onVolumeChange, object: self, userInfo: ["data": data])
+            if type == "VOLUME" {
+                if let volume = json.getInt(at: ["notification", "data", "speaker", "level"]),
+                   let muted = json.getBool(at: ["notification", "data", "speaker", "muted"]),
+                   let minimum = json.getInt(at: ["notification", "data", "speaker", "range", "minimum"]),
+                   let maximum = json.getInt(at: ["notification", "data", "speaker", "range", "maximum"]) {
 
-            } else if json["notification"]["type"].stringValue == "PROGRESS_INFORMATION" {
-                let playQueueItemId = json["notification"]["data"]["playQueueItemId"].stringValue
-                let strState = json["notification"]["data"]["state"].stringValue
-                let state = DeviceState.init(rawValue: strState) ?? DeviceState.unknown
-                let data = Progress(playQueueItemId: playQueueItemId, state: state)
-                NotificationCenter.default.post(name: .onProgress, object: self, userInfo: ["data": data])
+                    let data = Volume(volume: volume, muted: muted, minimum: minimum, maximum: maximum)
+                    NotificationCenter.default.post(name: .onVolumeChange, object: self, userInfo: ["data": data])
+                }
 
-            } else if json["notification"]["type"].stringValue == "SOURCE" {
-                let id = json["notification"]["data"]["primary"].stringValue
-                let type = json["notification"]["data"]["primaryExperience"]["source"]["sourceType"]["type"].stringValue
-                let category = json["notification"]["data"]["primaryExperience"]["source"]["category"].stringValue
-                let friendlyName = json["notification"]["data"]["primaryExperience"]["source"]["friendlyName"].stringValue
-                let productJid = json["notification"]["data"]["primaryExperience"]["source"]["product"]["jid"].stringValue
-                let productFriendlyName = json["notification"]["data"]["primaryExperience"]["source"]["product"]["friendlyName"].stringValue
-                let strState = json["notification"]["data"]["primaryExperience"]["state"].stringValue
-                let state = DeviceState.init(rawValue: strState) ?? DeviceState.unknown
-                let data = Source(id: id, type: type, category: category, friendlyName: friendlyName, productJid: productJid, productFriendlyName: productFriendlyName, state: state)
-                NotificationCenter.default.post(name: .onSourceChange, object: self, userInfo: ["data": data])
+            } else if type == "PROGRESS_INFORMATION" {
+                if let playQueueItemId = json.getString(at: ["notification", "data", "playQueueItemId"]),
+                   let strState = json.getString(at: ["notification", "data", "state"]) {
 
-            } else if json["notification"]["type"].stringValue == "NOW_PLAYING_NET_RADIO" {
-                let stationId = json["notification"]["data"]["stationId"].stringValue
-                let liveDescription = json["notification"]["data"]["liveDescription"].stringValue
-                let name = json["notification"]["data"]["name"].stringValue
-                let data = NowPlayingRadio(stationId: stationId, liveDescription: liveDescription, name: name)
-                NotificationCenter.default.post(name: .onNowPlayingRadio, object: self, userInfo: ["data": data])
+                    let state = DeviceState.init(rawValue: strState) ?? DeviceState.unknown
+                    let data = Progress(playQueueItemId: playQueueItemId, state: state)
+                    NotificationCenter.default.post(name: .onProgress, object: self, userInfo: ["data": data])
+                }
 
-            } else if json["notification"]["type"].stringValue == "NOW_PLAYING_STORED_MUSIC" {
-                let name = json["notification"]["data"]["name"].stringValue
-                let artist = json["notification"]["data"]["artist"].stringValue
-                let album = json["notification"]["data"]["album"].stringValue
-                let data = NowPlayingStoredMusic(name: name, artist: artist, album: album)
-                NotificationCenter.default.post(name: .onNowPlayingStoredMusic, object: self, userInfo: ["data": data])
+            } else if type == "SOURCE" {
+                if let id = json.getString(at: ["notification", "data", "primary"]),
+                   let sourceType = json.getString(at: ["notification", "data", "primaryExperience", "source", "sourceType", "type"]),
+                   let category = json.getString(at: ["notification", "data", "primaryExperience", "source", "category"]),
+                   let friendlyName = json.getString(at: ["notification", "data", "primaryExperience", "source", "friendlyName"]),
+                   let productJid = json.getString(at: ["notification", "data", "primaryExperience", "source", "product", "jid"]),
+                   let productFriendlyName = json.getString(at: ["notification", "data", "primaryExperience", "source", "product", "friendlyName"]),
+                   let strState = json.getString(at: ["notification", "data", "primaryExperience", "state"]) {
+
+                    let state = DeviceState.init(rawValue: strState) ?? DeviceState.unknown
+                    let data = Source(id: id, type: sourceType, category: category, friendlyName: friendlyName, productJid: productJid, productFriendlyName: productFriendlyName, state: state)
+                    NotificationCenter.default.post(name: .onSourceChange, object: self, userInfo: ["data": data])
+                }
+
+            } else if type == "NOW_PLAYING_NET_RADIO" {
+
+                if let stationId = json.getString(at: ["notification", "data", "stationId"]),
+                   let liveDescription = json.getString(at: ["notification", "data", "liveDescription"]),
+                   let name = json.getString(at: ["notification", "data", "name"]) {
+
+                    let data = NowPlayingRadio(stationId: stationId, liveDescription: liveDescription, name: name)
+                    NotificationCenter.default.post(name: .onNowPlayingRadio, object: self, userInfo: ["data": data])
+                }
+
+            } else if type == "NOW_PLAYING_STORED_MUSIC" {
+
+                if let name = json.getString(at: ["notification", "data", "name"]),
+                   let artist = json.getString(at: ["notification", "data", "artist"]),
+                   let album = json.getString(at: ["notification", "data", "album"]) {
+
+                    let data = NowPlayingStoredMusic(name: name, artist: artist, album: album)
+                    NotificationCenter.default.post(name: .onNowPlayingStoredMusic, object: self, userInfo: ["data": data])
+                }
+
             }
         }
     }

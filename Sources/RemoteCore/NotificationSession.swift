@@ -8,9 +8,12 @@ public class NotificationSession : NSObject, URLSessionDataDelegate {
     private var backoff = 1
 
     private lazy var session: URLSession = {
-        let configuration = URLSessionConfiguration.default
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+
         //configuration.timeoutIntervalForRequest = TimeInterval(3)
         //configuration.timeoutIntervalForResource = TimeInterval(5)
+
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
 
@@ -23,6 +26,7 @@ public class NotificationSession : NSObject, URLSessionDataDelegate {
     }
 
     public init(url: URL, processor: NotificationProcessor) {
+        URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
         self.url = url
         self.processor = processor
     }

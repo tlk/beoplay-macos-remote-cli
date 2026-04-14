@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/envoy/Embassy.git",
         "state": {
           "branch": null,
-          "revision": "189436100c00efbf5fb2653fe7972a9371db0a91",
-          "version": "4.1.1"
+          "revision": "8469f2c1b334a7c1c3566e2cb2f97826c7cca898",
+          "version": "4.1.6"
         }
       },
       {
@@ -35,15 +35,6 @@
           "branch": null,
           "revision": "7a46a5fc86cb917f69e3daf79fcb045283d8f008",
           "version": "8.1.2"
-        }
-      },
-      {
-        "package": "SwiftyJSON",
-        "repositoryURL": "https://github.com/IBM-Swift/SwiftyJSON",
-        "state": {
-          "branch": null,
-          "revision": "f9b4754017cfad4701f0838b2e507b442eaca70a",
-          "version": "17.0.5"
         }
       }
     ]

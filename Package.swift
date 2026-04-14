@@ -20,7 +20,6 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/IBM-Swift/SwiftyJSON", from: "17.0.5"),
         .package(url: "https://github.com/tlk/linenoise-swift", from: "0.0.4"),
         .package(url: "https://github.com/Envoy/Ambassador", from: "4.0.5"),
     ],
@@ -32,10 +31,10 @@ let package = Package(
             dependencies: ["RemoteCore", "Emulator", "LineNoise"]),
         .target(
             name: "Emulator",
-            dependencies: ["RemoteCore", "Ambassador", "SwiftyJSON"]),
+            dependencies: ["RemoteCore", "Ambassador"]),
         .target(
             name: "RemoteCore",
-            dependencies: ["SwiftyJSON"]),
+            dependencies: []),
         .testTarget(
             name: "RemoteCoreTests",
             dependencies: ["RemoteCore"]),

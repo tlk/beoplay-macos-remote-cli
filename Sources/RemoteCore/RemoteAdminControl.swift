@@ -1,11 +1,9 @@
 import Foundation
-import SwiftyJSON
 
 public class RemoteAdminControl {
     private var endpoint = URLComponents()
 
     public init() {
-        URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
     }
 
@@ -41,20 +39,18 @@ public class RemoteAdminControl {
         func completionData(data: Data?) {
             var sourceIds = [String]()
 
-            guard let jsonData = data, jsonData.count > 0 else {
+            guard let json = JSON.from(input: data),
+                  let collection = json.getAny() as? [[String: Any]],
+                  let first = collection.first,
+                  let list = JSON(from: first).getAny(at: ["controlledSources", "controlledSources"]) as? [[String: Any]] else {
                 completion(sourceIds)
                 return
             }
 
-            let json = JSON(data: jsonData)
-
-            guard let list = json[0]["controlledSources"]["controlledSources"].array else {
-                completion(sourceIds)
-                return
-            }
-
-            for source in list {
-                if source["enabled"].boolValue, let id = source["sourceId"].string {
+            for element in list {
+                let source = JSON(from: element)
+                if source.getBool(at: ["enabled"]) == true,
+                   let id = source.getString(at: ["sourceId"]) {
                     sourceIds.append(id)
                 }
             }

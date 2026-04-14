@@ -1,5 +1,4 @@
 import Foundation
-import SwiftyJSON
 
 public class RemoteControl {
     private var endpoint = URLComponents()
@@ -8,7 +7,6 @@ public class RemoteControl {
     private let browser = BeoplayBrowser()
 
     public init() {
-        URLCache.shared.removeAllCachedResponses()
         URLCache.shared = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
     }
 
@@ -54,7 +52,7 @@ public class RemoteControl {
         self.endpoint.host = nil
         self.endpoint.port = nil
         self.remoteAdmin.clearEndpoint()
-	}
+    }
 
     public func hasEndpoint() -> Bool {
         return self.endpoint.host != nil
@@ -64,29 +62,41 @@ public class RemoteControl {
         func completionData(data: Data?) {
             var sources = [BeoplaySource]()
 
-            guard let jsonData = data, jsonData.count > 0 else {
-                completion(sources)
-                return
-            }
-
-            let json = JSON(data: jsonData)
-
-            guard let list = json["sources"].array else {
+            guard let json = JSON.from(input: data),
+                  let list = json.getAny(at: ["sources"]) as? [[Any]] else {
                 completion(sources)
                 return
             }
 
             for element in list {
-                let source = BeoplaySource(
-                    id: element[0].stringValue,
-                    sourceType: element[1]["sourceType"]["type"].stringValue,
-                    category: element[1]["category"].stringValue,
-                    friendlyName: element[1]["friendlyName"].stringValue,
-                    borrowed: element[1]["borrowed"].boolValue,
-                    productJid: element[1]["product"]["jid"].stringValue,
-                    productFriendlyName: element[1]["product"]["friendlyName"].stringValue
-                )
-                sources.append(source)
+                guard element.count > 1,
+                    let id = element.first as? String,
+                    let second = element.dropFirst().first
+                else {
+                    continue
+                }
+
+                let details = JSON(from: second)
+
+                if let sourceType = details.getString(at: ["sourceType", "type"]),
+                   let category = details.getString(at: ["category"]),
+                   let friendlyName = details.getString(at: ["friendlyName"]),
+                   let borrowed = details.getBool(at: ["borrowed"]),
+                   let productJid = details.getString(at: ["product", "jid"]),
+                   let productFriendlyName = details.getString(at: ["product", "friendlyName"]) {
+
+                    let source = BeoplaySource(
+                        id: id,
+                        sourceType: sourceType,
+                        category: category,
+                        friendlyName: friendlyName,
+                        borrowed: borrowed,
+                        productJid: productJid,
+                        productFriendlyName: productFriendlyName
+                    )
+                    sources.append(source)
+                }
+
             }
             completion(sources)
         }
@@ -126,28 +136,24 @@ public class RemoteControl {
         var favorites = [(String, String)]()
         request(method: "GET", path: "/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation") { data in
 
-            guard let jsonData = data, jsonData.count > 0 else {
-                completion(favorites)
-                return
+            if let json = JSON.from(input: data),
+               let list = json.getAny(at: ["favoriteListStationList", "favoriteListStation"]) as? [Any] {
+
+                for station in list {
+                    let details = JSON(from: station)
+                    if let stationId = details.getString(at:["station", "tuneIn", "stationId"]),
+                       let stationName = details.getString(at:["station", "name"]) {
+                        favorites.append((stationId, stationName))
+                    }
+                }
             }
 
-            let json = JSON(data: jsonData)
-
-            guard let list = json["favoriteListStationList"]["favoriteListStation"].array else {
-                completion(favorites)
-                return
-            }
-
-            for element in list {
-                let station = element["station"]
-                favorites.append((station["tuneIn"]["stationId"].stringValue, station["name"].stringValue))
-            }
             completion(favorites)
         }
     }
 
     public func tuneIn(stations: [(String, String)], _ completion: @escaping () -> () = {}) {
-        let items = stations.map { id, name in
+        let items: [[String: Any]] = stations.map { id, name in
             [
                 "behaviour": "planned",
                 "id": id,
@@ -168,7 +174,11 @@ public class RemoteControl {
                 ]
             ]
         }
-        let payload = JSON(["playQueueItem": items]).rawString()!
+
+        guard let payload = JSON(from: ["playQueueItem": items]).serialize() else {
+            completion()
+            return
+        }
 
         request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/") {
             self.request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion)
@@ -215,17 +225,14 @@ public class RemoteControl {
 
     public func getVolume(_ completion: @escaping (Int?) -> ()) {
         func getVolumeFromJSON(_ data: Data?) -> Int? {
-            guard let jsonData = data, jsonData.count > 0 else {
+            if let json = JSON.from(input: data),
+               let volume = json.getInt(at: ["speaker", "level"])
+            {
+                return volume
+            }
+            else {
                 return nil
             }
-
-            let json = JSON(data: jsonData)
-
-            guard let volume = json["speaker"]["level"].int else {
-                return nil
-            }
-
-            return volume
         }
 
         func completionData(data: Data?) {

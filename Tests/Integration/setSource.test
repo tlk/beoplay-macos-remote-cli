@@ -1,1 +1,1 @@
-beoplay-cli setSource "radio:1234.1234567.12345678@products.bang-olufsen.com"
+beoplay-cli setSource "beoradio:1234.1234567.12345678@products.bang-olufsen.com"

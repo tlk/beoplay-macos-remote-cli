@@ -34,8 +34,7 @@ public class CommandLineTool {
         "getSources",
         "getEnabledSources",
         "setSource ",
-        "getTuneInFavorites",
-        "tuneIn ",
+        "getRadioFavorites",
         "join",
         "leave",
         "play",
@@ -149,13 +148,45 @@ public class CommandLineTool {
             self.remoteControl.getEnabledSources(sourcesHandler)
             block()
         case "setSource":
-            if let _ = option?.range(of: #"^\w+:.+"#, options: .regularExpression) {
-                self.remoteControl.setSource(id: option!, unblock)
-                block()
+            if option != nil {
+
+                let parts = option!.split(separator: ",")
+
+                if parts.count == 1 {
+                    let sourceId = option
+                    if let _ = sourceId?.range(of: #"^\w+:.+"#, options: .regularExpression) {
+                        self.remoteControl.setSource(id: sourceId!, unblock)
+                        block()
+                    } else {
+                        fputs("  example:  setSource spotify:2714.1200304.28096178@products.bang-olufsen.com\n", stderr)
+                        return 1
+                    }
+                } else if parts.count == 2 {
+                    let sourceId = String(parts[0])
+                    let contentId = String(parts[1])
+                    self.remoteControl.setSourceAndContent(sourceId: sourceId, contentId: contentId, unblock)
+                    block()
+                } else {
+                    fputs("  example:  setSource beoradio:2714.1200304.28096178@products.bang-olufsen.com,5553697610739619\n", stderr)
+                    return 1
+                }
+
             } else {
-                fputs("  example:  setSource spotify:2714.1200304.28096178@products.bang-olufsen.com\n", stderr)
+                fputs("  example:  getEnabledSources\n", stderr)
+                fputs("            setSource spotify:2714.1200304.28096178@products.bang-olufsen.com\n", stderr)
+                fputs("\n", stderr)
+                fputs("            getRadioFavorites\n", stderr)
+                fputs("            setSource beoradio:2714.1200304.28096178@products.bang-olufsen.com,5553697610739619\n", stderr)
                 return 1
             }
+        case "getRadioFavorites":
+            self.remoteControl.getRadioFavorites { (favorites) in
+                for station in favorites {
+                    print("\(station.0)\t\(station.1)")
+                }
+                self.unblock()
+            }
+            block()
         case "join":
             self.remoteControl.join(unblock)
             block()
@@ -244,39 +275,7 @@ public class CommandLineTool {
             for observer in observers {
                 NotificationCenter.default.removeObserver(observer)
             }
-        case "getTuneInFavorites":
-            self.remoteControl.getTuneInFavorites { (favorites) in
-                for station in favorites {
-                    print("\(station.0)\t\(station.1)")
-                }
-                self.unblock()
-            }
-            block()
-        case "tuneIn":
-            func map(_ input: String?) -> (String,String)? {
-                input?.range(of: #"^s[0-9]+$"#, options: .regularExpression) != nil
-                    ? (input!,input!)
-                    : nil
-            }
-            var stations = [(String,String)]()
-            if let matches = option?.contains(","), matches == true {
-                let result = option?.split(separator: ",").compactMap {
-                    id in map(String(id))
-                }
-                if result != nil {
-                    stations = result!
-                }
-            } else if let station = map(option) {
-                stations.append(station)
-            }
 
-            if stations.isEmpty == false {
-                self.remoteControl.tuneIn(stations: stations, unblock)
-                block()
-            } else {
-                fputs("  example:  tuneIn s24861,s37309,s69060,s45455,s69056\n", stderr)
-                return 1
-            }
         case "emulator":
             let name = option ?? "Beoplay Emulated Device"
             var port = 80

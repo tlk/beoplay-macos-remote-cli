@@ -1,0 +1,1 @@
+beoplay-cli getRadioFavorites | grep DR

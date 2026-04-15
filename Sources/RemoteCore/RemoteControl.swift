@@ -132,16 +132,20 @@ public class RemoteControl {
         request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: "{\"primaryExperience\":{\"source\":{\"id\":\"\(id)\"}}}", completion)
     }
 
-    public func getTuneInFavorites(_ completion: @escaping (_ favorites: [(String, String)]) -> ()) {
+    public func setSourceAndContent(sourceId: String, contentId: String, _ completion: @escaping () -> () = {}) {
+        request(method: "POST", path: "/BeoZone/Zone/ActiveSources", body: "{\"primaryExperience\":{\"source\":{\"id\":\"\(sourceId)\"}},\"contentId\":\"\(contentId)\"}", completion)
+    }
+
+    public func getRadioFavorites(_ completion: @escaping (_ favorites: [(String, String)]) -> ()) {
         var favorites = [(String, String)]()
-        request(method: "GET", path: "/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation") { data in
+        request(method: "GET", path: "/BeoContent/radio/netRadioProfile/favoriteList/favorite/favoriteListStation") { data in
 
             if let json = JSON.from(input: data),
                let list = json.getAny(at: ["favoriteListStationList", "favoriteListStation"]) as? [Any] {
 
                 for station in list {
                     let details = JSON(from: station)
-                    if let stationId = details.getString(at:["station", "tuneIn", "stationId"]),
+                    if let stationId = details.getString(at:["station", "beoradio", "stationId"]),
                        let stationName = details.getString(at:["station", "name"]) {
                         favorites.append((stationId, stationName))
                     }
@@ -149,39 +153,6 @@ public class RemoteControl {
             }
 
             completion(favorites)
-        }
-    }
-
-    public func tuneIn(stations: [(String, String)], _ completion: @escaping () -> () = {}) {
-        let items: [[String: Any]] = stations.map { id, name in
-            [
-                "behaviour": "planned",
-                "id": id,
-                "station": [
-                    "id": id,
-                    "image": [
-                        [
-                            "mediatype": "image/jpg",
-                            "size": "medium",
-                            "url": ""
-                        ]
-                    ],
-                    "name": name,
-                    "tuneIn": [
-                        "location": "",
-                        "stationId": id
-                    ]
-                ]
-            ]
-        }
-
-        guard let payload = JSON(from: ["playQueueItem": items]).serialize() else {
-            completion()
-            return
-        }
-
-        request(method: "DELETE", path: "/BeoZone/Zone/PlayQueue/") {
-            self.request(method: "POST", path: "/BeoZone/Zone/PlayQueue/", query: "instantplay", body: payload, completion)
         }
     }
 

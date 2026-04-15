@@ -272,88 +272,147 @@ extension DeviceEmulator {
             }
         }
 
-        // Get TuneIn favorite stations, original port: 8080
-        router["/BeoContent/radio/netRadioProfile/favoriteList/id=f1/favoriteListStation"] = DelayResponse(JSONResponse(handler: { _ -> Any in
+        // Get B&O Radio favorite stations, original port: 8080
+        router["/BeoContent/radio/netRadioProfile/favoriteList/favorite/favoriteListStation"] = DelayResponse(JSONResponse(handler: { _ -> Any in
             return [
-                "favoriteListStationList": [
-                    "offset": 0,
-                    "count": 3,
-                    "total": 3,
-                    "favoriteListStation": [
+              "favoriteListStationList": [
+                "offset": 0,
+                "count": 3,
+                "total": 3,
+                "favoriteListStation": [
+                  [
+                    "id": "6336061628069729",
+                    "number": 0,
+                    "station": [
+                      "id": "6336061628069729",
+                      "name": "DR P1",
+                      "liveDescription": "DR P1 er DR's første radiokanal",
+                      "beoradio": [
+                        "stationId": "6336061628069729"
+                      ],
+                      "image": [
                         [
-                            "id": "id%3df1_0",
-                            "number": 1,
-                            "station": [
-                                "id": "id%3df1_0",
-                                "name": "90.8 | DR P1",
-                                "tuneIn": [
-                                    "stationId": "s24860",
-                                    "location": ""
-                                ],
-                                "image": [
-                                    [
-                                        "url": "http://cdn-profiles.tunein.com/s24860/images/logog.png",
-                                        "size": "large",
-                                        "mediatype": "image/png"
-                                    ]
-                                ]
-                            ],
-                            "_links": [
-                                "self": [
-                                    "href": "./id%3df1_0"
-                                ]
-                            ]
+                          "url": "http://static.airable.io/14/37/146822.png",
+                          "size": "large",
+                          "mediatype": "image/png"
                         ],
                         [
-                            "id": "id%3df1_1",
-                            "number": 2,
-                            "station": [
-                                "id": "id%3df1_1",
-                                "name": "DR P2 Klassisk (Classical Music)",
-                                "tuneIn": [
-                                    "stationId": "s37197",
-                                    "location": ""
-                                ],
-                                "image": [
-                                    [
-                                        "url": "http://cdn-profiles.tunein.com/s37197/images/logog.png",
-                                        "size": "large",
-                                        "mediatype": "image/png"
-                                    ]
-                                ]
-                            ],
-                            "_links": [
-                                "self": [
-                                    "href": "./id%3df1_1"
-                                ]
-                            ]
+                          "url": "http://static.airable.io/82/44/246012.png",
+                          "size": "medium",
+                          "mediatype": "image/png"
                         ],
                         [
-                            "id": "id%3df1_2",
-                            "number": 3,
-                            "station": [
-                                "id": "id%3df1_2",
-                                "name": "93.9 | DR P3 (Euro Hits)",
-                                "tuneIn": [
-                                    "stationId": "s24861",
-                                    "location": ""
-                                ],
-                                "image": [
-                                    [
-                                        "url": "http://cdn-profiles.tunein.com/s24861/images/logog.png",
-                                        "size": "large",
-                                        "mediatype": "image/png"
-                                    ]
-                                ]
-                            ],
-                            "_links": [
-                                "self": [
-                                    "href": "./id%3df1_2"
-                                ]
-                            ]
+                          "url": "http://static.airable.io/64/02/797233.png",
+                          "size": "small",
+                          "mediatype": "image/png"
                         ]
+                      ]
+                    ],
+                    "_capabilities": [
+                      "editable": [
+                        "number"
+                      ]
+                    ],
+                    "_links": [
+                      "/relation/delete": [
+                        "href": "./6336061628069729"
+                      ],
+                      "self": [
+                        "href": "./6336061628069729"
+                      ]
                     ]
+                  ],
+                  [
+                    "id": "3666300007607788",
+                    "number": 1,
+                    "station": [
+                      "id": "3666300007607788",
+                      "name": "DR P2",
+                      "liveDescription": "P2 er den inspirerende musikkanal for alle der holder af klassisk. Døgnet rundt med den bedste musik, udblik og passionerede værter.",
+                      "beoradio": [
+                        "stationId": "3666300007607788"
+                      ],
+                      "image": [
+                        [
+                          "url": "http://static.airable.io/88/23/496262.png",
+                          "size": "large",
+                          "mediatype": "image/png"
+                        ],
+                        [
+                          "url": "http://static.airable.io/66/53/876129.png",
+                          "size": "medium",
+                          "mediatype": "image/png"
+                        ],
+                        [
+                          "url": "http://static.airable.io/78/28/481228.png",
+                          "size": "small",
+                          "mediatype": "image/png"
+                        ]
+                      ]
+                    ],
+                    "_capabilities": [
+                      "editable": [
+                        "number"
+                      ]
+                    ],
+                    "_links": [
+                      "/relation/delete": [
+                        "href": "./3666300007607788"
+                      ],
+                      "self": [
+                        "href": "./3666300007607788"
+                      ]
+                    ]
+                  ],
+                  [
+                    "id": "8779112938791514",
+                    "number": 2,
+                    "station": [
+                      "id": "8779112938791514",
+                      "name": "DR P3",
+                      "liveDescription": "Det du hører, er du selv",
+                      "beoradio": [
+                        "stationId": "8779112938791514"
+                      ],
+                      "image": [
+                        [
+                          "url": "http://static.airable.io/18/61/194909.png",
+                          "size": "large",
+                          "mediatype": "image/png"
+                        ],
+                        [
+                          "url": "http://static.airable.io/99/64/130945.png",
+                          "size": "medium",
+                          "mediatype": "image/png"
+                        ],
+                        [
+                          "url": "http://static.airable.io/18/37/532943.png",
+                          "size": "small",
+                          "mediatype": "image/png"
+                        ]
+                      ]
+                    ],
+                    "_capabilities": [
+                      "editable": [
+                        "number"
+                      ]
+                    ],
+                    "_links": [
+                      "/relation/delete": [
+                        "href": "./8779112938791514"
+                      ],
+                      "self": [
+                        "href": "./8779112938791514"
+                      ]
+                    ]
+                  ]
+                ],
+                "_links": [
+                  "/relation/modify": [
+                    "href": "."
+                  ]
                 ]
+              ]
             ]
         }))
 

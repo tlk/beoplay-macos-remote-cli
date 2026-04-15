@@ -18,9 +18,9 @@ The RemoteCore library is also used by https://github.com/tlk/beoplay-macos-remo
 #### Non-interactive mode
 ```
 $ beoplay-cli discover
-+ "Beoplay Device"	http://BeoplayDevice.local.:8080
++ "My Beoplay Device"	http://BeoplayDevice.local.:8080
 
-$ export BEOPLAY_NAME="Beoplay Device"
+$ export BEOPLAY_NAME="My Beoplay Device"
 $ beoplay-cli getVolume
 35
 $ beoplay-cli setVolume 20
@@ -31,16 +31,14 @@ $ beoplay-cli play
 $ beoplay-cli monitor
 RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.connecting, message: nil)
 RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.online, message: nil)
-RemoteCore.Source(id: "radio:2714.1200304.28096178@products.bang-olufsen.com", type: "TUNEIN", category: "RADIO", friendlyName: "TuneIn", productJid: "2714.1200304.28096178@products.bang-olufsen.com", productFriendlyName: "Beoplay M5 i køkkenet", state: RemoteCore.DeviceState.play)
-RemoteCore.NowPlayingRadio(stationId: "s37309", liveDescription: "Higher Love - Kygo & Whitney Houston", name: "96.5 | DR P4 København (Euro Hits)")
-RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
-RemoteCore.Volume(volume: 35, muted: false, minimum: 0, maximum: 90)
-RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
-RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
-RemoteCore.Progress(playQueueItemId: "plid-4342.3", state: RemoteCore.DeviceState.play)
-
-RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.disconnecting, message: nil)
-RemoteCore.NotificationBridge.DataConnectionNotification(state: RemoteCore.NotificationSession.ConnectionState.offline, message: nil)
+RemoteCore.Source(id: "beoradio:2714.1200304.28096178@products.bang-olufsen.com", type: "BEO RADIO", category: "RADIO", friendlyName: "B&O Radio", productJid: "2714.1200304.28096178@products.bang-olufsen.com", productFriendlyName: "My Beoplay Device", state: RemoteCore.DeviceState.play)
+RemoteCore.NowPlayingRadio(stationId: "4338732615578920", liveDescription: "/ Melissa Aldana - No pidas imposibles", name: "DR P8 JAZZ")
+RemoteCore.Progress(playQueueItemId: "beoradio", state: RemoteCore.DeviceState.play)
+RemoteCore.Volume(volume: 15, muted: false, minimum: 0, maximum: 90)
+RemoteCore.Progress(playQueueItemId: "beoradio", state: RemoteCore.DeviceState.play)
+RemoteCore.Progress(playQueueItemId: "beoradio", state: RemoteCore.DeviceState.play)
+RemoteCore.Progress(playQueueItemId: "beoradio", state: RemoteCore.DeviceState.play)
+^C
 $
 $ beoplay-cli monitor volume
 RemoteCore.Volume(volume: 23, muted: false, minimum: 0, maximum: 90)
@@ -60,7 +58,7 @@ $
 ```
 $ make install
 swift build -c release
-[5/5] Linking ./.build/x86_64-apple-macosx/release/beoplay-cli
+[9/9] Linking beoplay-cli
 cp .build/release/beoplay-cli /usr/local/bin/beoplay-cli
 ```
 
